@@ -1,0 +1,7 @@
+[package]
+name = "invert-binary-tree"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies.binary-tree-paths]
+path = "../binary-tree-paths"
