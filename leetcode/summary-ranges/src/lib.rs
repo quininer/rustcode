@@ -6,19 +6,19 @@ fn summary(list: Vec<usize>) -> Vec<String> {
     let mut left = String::new();
     l.push(!0);
 
-    for (n, x) in l.iter().zip(&l[1..l.len()]) {
+    for w in l.windows(2) {
         if left.len() == 0 {
-            left = format!("{}", n);
+            left = format!("{}", w[0]);
         }
-        if n+1 != *x {
+        if w[0]+1 != w[1] {
             result.push(
-                if left.parse::<usize>().unwrap() == *n {
+                if left.parse::<usize>().unwrap() == w[0] {
                     format!("{}", left)
                 } else {
-                    format!("{}->{}", left, n)
+                    format!("{}->{}", left, w[0])
                 }
             );
-            left = format!("{}", x);
+            left = format!("{}", w[1]);
         };
     };
 
