@@ -1,5 +1,4 @@
 #[allow(dead_code)]
-
 fn str_find(haystack: &str, needle: &str) -> usize {
     // haystack.find(needle).unwrap_or(-1)
     if haystack.len() == 0 || needle.len() == 0 {

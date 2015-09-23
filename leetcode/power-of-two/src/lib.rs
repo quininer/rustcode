@@ -1,5 +1,4 @@
 #[allow(dead_code)]
-
 fn is_pot(num: usize) -> bool {
     if num == 1 {
         true

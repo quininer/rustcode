@@ -1,5 +1,4 @@
 #[allow(dead_code)]
-
 fn summary(list: Vec<usize>) -> Vec<String> {
     let mut l = list.clone();
     let mut result = vec![];
@@ -10,7 +9,7 @@ fn summary(list: Vec<usize>) -> Vec<String> {
         if left.len() == 0 {
             left = format!("{}", w[0]);
         }
-        if w[0]+1 != w[1] {
+        if w[0] != w[1] && w[0]+1 != w[1] {
             result.push(
                 if left.parse::<usize>().unwrap() == w[0] {
                     format!("{}", left)
@@ -28,4 +27,5 @@ fn summary(list: Vec<usize>) -> Vec<String> {
 #[test]
 fn it_works() {
     assert_eq!(summary(vec![0, 1, 2, 4, 5, 7]), vec!["0->2", "4->5", "7"]);
+    assert_eq!(summary(vec![0, 1, 2, 4, 4, 5, 7]), vec!["0->2", "4->5", "7"]);
 }
