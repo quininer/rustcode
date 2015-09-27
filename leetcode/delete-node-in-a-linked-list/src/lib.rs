@@ -1,46 +1,46 @@
 #![allow(dead_code)]
 
 #[derive(Clone)]
-struct LinkedList {
-    key: usize,
-    next: Option<Box<LinkedList>>
+pub struct LinkedList {
+    pub val: usize,
+    pub next: Option<Box<LinkedList>>
 }
 
-fn delete_node(mut list: Box<LinkedList>, key: usize) -> Option<Box<LinkedList>> {
-    if (&list).key == key {
-        return list.next;
+fn delete_node(mut linked: Box<LinkedList>, val: usize) -> Option<Box<LinkedList>> {
+    if (&linked).val == val {
+        return linked.next;
     };
 
-    if (&list).next.is_some() {
-        list.next = delete_node(list.clone().next.unwrap(), key);
+    if (&linked).next.is_some() {
+        linked.next = delete_node(linked.clone().next.unwrap(), val);
     };
 
-    Some(list)
+    Some(linked)
 }
 
-fn listpath(list: Box<LinkedList>) -> String {
-    if (&list).next.is_none() {
-        format!("{}", (&list).key)
+fn listpath(linked: Box<LinkedList>) -> String {
+    if (&linked).next.is_none() {
+        format!("{}", (&linked).val)
     } else {
-        format!("{}->{}", (&list).key, listpath(list.clone().next.unwrap()))
+        format!("{}->{}", (&linked).val, listpath(linked.clone().next.unwrap()))
     }
 }
 
 #[test]
 fn it_works() {
-    let list = delete_node(Box::new(LinkedList {
-        key: 1,
+    let linked = delete_node(Box::new(LinkedList {
+        val: 1,
         next: Some(Box::new(LinkedList {
-            key: 2,
+            val: 2,
             next: Some(Box::new(LinkedList {
-                key: 3,
+                val: 3,
                 next: Some(Box::new(LinkedList {
-                    key: 4,
+                    val: 4,
                     next: None
                 }))
             }))
         }))
     }), 3);
 
-    assert_eq!(listpath(list.unwrap()), "1->2->4");
+    assert_eq!(listpath(linked.unwrap()), "1->2->4");
 }

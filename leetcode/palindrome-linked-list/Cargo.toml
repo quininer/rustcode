@@ -1,0 +1,7 @@
+[package]
+name = "palindrome-linked-list"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies.delete-node-in-a-linked-list]
+path = "../delete-node-in-a-linked-list"
