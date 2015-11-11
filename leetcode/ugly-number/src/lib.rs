@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-fn is_ugly(mut num: i32) -> bool {
+fn is_ugly(mut num: usize) -> bool {
     let mut uglys = vec![2, 3, 5];
 
     while !uglys.is_empty() {

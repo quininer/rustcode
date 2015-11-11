@@ -1,0 +1,9 @@
+[package]
+name = "slave"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[lib]
+crate-type = ["dylib"]
+
+[dependencies]

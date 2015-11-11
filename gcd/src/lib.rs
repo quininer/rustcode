@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-fn gcd(mut x: isize, mut y: isize) -> isize {
+fn gcd(mut x: usize, mut y: usize) -> usize {
     while y != 0 {
         let t = y;
         y = x % y;

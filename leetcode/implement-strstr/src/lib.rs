@@ -1,7 +1,7 @@
 #![feature(negate_unsigned)]
 
 #[allow(dead_code)]
-fn str_find(haystack: &str, needle: &str) -> usize {
+fn str_find(haystack: &str, needle: &str) -> isize {
     // haystack.find(needle).unwrap_or(-1)
     if haystack.len() == 0 || needle.len() == 0 {
         return -1;
@@ -15,7 +15,7 @@ fn str_find(haystack: &str, needle: &str) -> usize {
             break;
         };
         if b == s && &haystack[j..j+needle.len()] == needle {
-            return j;
+            return j as isize;
         };
 
         j += 1;

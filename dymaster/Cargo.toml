@@ -1,0 +1,7 @@
+[package]
+name = "dymaster"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies]
+libloading = "*"
