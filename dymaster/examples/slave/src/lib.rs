@@ -5,5 +5,5 @@ pub extern fn foo(bar: isize) -> isize {
 
 #[test]
 fn it_works() {
-    assert_eq!(foo(4), 8);
+    assert_eq!(foo(4), 256);
 }
