@@ -1,0 +1,10 @@
+[package]
+name = "single-byte-xor-cipher"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies]
+rustc-serialize = "*"

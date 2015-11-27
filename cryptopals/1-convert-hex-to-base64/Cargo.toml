@@ -1,0 +1,7 @@
+[package]
+name = "convert-hex-to-base64"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies]
+rustc-serialize = "*"

@@ -1,11 +1,12 @@
 extern crate libloading;
 
+use std::path::Path;
 use std::env::{ args };
 use libloading::{ Library, Symbol };
 
 fn main() {
     let slave = Library::new(
-        args().nth(1).unwrap_or(String::from("./libslave.so"))
+        Path::new(&args().nth(1).unwrap_or(String::from("./libslave.so")))
     ).expect("load the library error.");
 
     let foo: Symbol<extern fn(isize) -> isize> = unsafe {
