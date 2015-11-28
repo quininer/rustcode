@@ -1,0 +1,13 @@
+[package]
+name = "detect-single-character-xor"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies]
+rustc-serialize = "*"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies.single-byte-xor-cipher]
+path = "../3-single-byte-xor-cipher"

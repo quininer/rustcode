@@ -1,0 +1,10 @@
+[package]
+name = "implement-repeating-key-xor"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies]
+rustc-serialize = "*"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
