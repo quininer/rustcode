@@ -20,7 +20,7 @@ pub fn xor(x: Vec<u8>, y: Vec<u8>) -> Result<Vec<u8>, Error> {
         Ok(
             x.iter()
                 .zip(y.iter())
-                .map(|n| n.0 ^ n.1)
+                .map(|(n, m)| n ^ m)
                 .collect::<Vec<u8>>()
         )
     } else {
