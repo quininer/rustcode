@@ -29,13 +29,13 @@ pub fn hamming_weight(x: u8) -> u8 {
 ///
 /// assert_eq!(
 ///     hamming_distance(
-///         b"this is a test".to_vec(),
-///         b"wokka wokka!!!".to_vec()
+///         b"this is a test",
+///         b"wokka wokka!!!"
 ///     ).ok(),
 ///     Some(37)
 /// );
 /// ```
-pub fn hamming_distance(x: Vec<u8>, y: Vec<u8>) -> Result<usize, Error> {
+pub fn hamming_distance(x: &[u8], y: &[u8]) -> Result<usize, Error> {
     if x.len() != y.len() {
         return Err(Error::LengthError);
     }

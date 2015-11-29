@@ -15,13 +15,13 @@ impl From<FromHexError> for Error {
     }
 }
 
-pub fn xor(x: Vec<u8>, y: Vec<u8>) -> Result<Vec<u8>, Error> {
+pub fn xor(x: &[u8], y: &[u8]) -> Result<Vec<u8>, Error> {
     if x.len() == y.len() {
         Ok(
             x.iter()
                 .zip(y.iter())
                 .map(|(n, m)| n ^ m)
-                .collect::<Vec<u8>>()
+                .collect()
         )
     } else {
         Err(Error::LengthError)
@@ -30,8 +30,8 @@ pub fn xor(x: Vec<u8>, y: Vec<u8>) -> Result<Vec<u8>, Error> {
 
 pub fn hexor(x: &str, y: &str) -> Result<String, Error> {
     xor(
-        try!(x.from_hex()),
-        try!(y.from_hex())
+        &try!(x.from_hex()),
+        &try!(y.from_hex())
     ).map(|u| u.to_hex())
 }
 

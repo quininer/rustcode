@@ -1,5 +1,4 @@
 extern crate rustc_serialize;
-extern crate fixed_xor;
 extern crate single_byte_xor_cipher;
 
 use rustc_serialize::hex::FromHex;
@@ -26,14 +25,14 @@ fn it_works() {
     use std::fs::File;
 
     let path = "./examples/4.txt";
-
     let mut data = String::new();
-    File::open(path).expect("read error.")
-        .read_to_string(&mut data).ok();
-    let bar = most_readable(xor_bymax_fromlist(data.split("\n").collect()));
+
+    File::open(path).expect("read error.").read_to_string(&mut data).ok();
 
     assert_eq!(
-        String::from_utf8(bar).ok(),
+        String::from_utf8(
+            most_readable(xor_bymax_fromlist(data.split("\n").collect()))
+        ).ok(),
         Some(String::from("nOWTHATTHEPARTYISJUMPING*"))
     );
 }

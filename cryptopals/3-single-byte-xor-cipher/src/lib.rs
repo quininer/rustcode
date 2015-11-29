@@ -9,6 +9,7 @@ pub fn analyse_frequency(x: &[u8]) -> Vec<(u8, usize)> {
     for i in 0..x.len() {
         *hmap.entry(&x[i]).or_insert(0) += 1;
     }
+
     let mut y = hmap.iter()
         .map(|x| (**x.0, *x.1))
         .collect::<Vec<(u8, usize)>>();
@@ -19,8 +20,8 @@ pub fn analyse_frequency(x: &[u8]) -> Vec<(u8, usize)> {
 
 pub fn xor_bymax(v: Vec<u8>) -> Vec<u8> {
     xor(
-        v.clone(),
-        vec![analyse_frequency(&v)[0].0; v.len()]
+        &v,
+        &vec![analyse_frequency(&v)[0].0; v.len()]
     ).expect("xor error.")
 }
 
