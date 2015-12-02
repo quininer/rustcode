@@ -18,5 +18,10 @@ fn it_works() {
     File::open(path).expect("read error.").read_to_string(&mut data).ok();
     data = data.replace("\n", "");
 
-    data.from_base64().unwrap();
+    let data = data.from_base64().unwrap();
+
+    assert_eq!(
+        hamming::guess_keysize(&data, 2..41).ok(),
+        Some(29)
+    )
 }

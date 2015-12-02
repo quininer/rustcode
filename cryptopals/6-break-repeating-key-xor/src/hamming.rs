@@ -17,7 +17,6 @@ pub enum Error {
     CipherTooShort
 }
 
-
 pub fn weight(x: u8) -> u8 {
     let x = (x & M1 ) + ((x >>  1) & M1); //put count of each  2 bits into those  2 bits
     let x = (x & M2 ) + ((x >>  2) & M2); //put count of each  4 bits into those  4 bits
@@ -52,15 +51,15 @@ pub fn distance(x: &[u8], y: &[u8]) -> Result<usize, Error> {
     )
 }
 
-pub fn possibility(cipher: &[u8], size: usize) -> Result<f64, Error> {
-    if cipher.len() < size * 2 {
+pub fn possibility(ciphertext: &[u8], size: usize) -> Result<f64, Error> {
+    if ciphertext.len() < size * 2 {
         return Err(Error::CipherTooShort);
     }
 
     let mut p = 0.0;
-    let ln = cipher
+    let ln = ciphertext
         .chunks(size)
-        .filter(|n| n.len() == 2)
+        .filter(|n| n.len() == size)
         .collect::<Vec<&[u8]>>();
 
     for n in ln.windows(2) {
@@ -71,12 +70,12 @@ pub fn possibility(cipher: &[u8], size: usize) -> Result<f64, Error> {
 }
 
 pub fn guess_keysize(
-    cipher: &[u8], r: ::std::ops::Range<usize>
+    ciphertext: &[u8], r: ::std::ops::Range<usize>
 ) -> Result<usize, Error> {
     let mut rr = Vec::new();
 
     for n in r {
-        rr.push((n, try!(possibility(cipher, n))));
+        rr.push((n, try!(possibility(ciphertext, n))));
     }
 
     rr.sort_by(|&(_, n), &(_, m)| n.partial_cmp(&m).unwrap_or(Equal));
