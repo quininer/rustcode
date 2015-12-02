@@ -3,6 +3,7 @@ extern crate fixed_xor;
 
 use fixed_xor::{ xor, Error };
 
+
 pub fn repeating_xor(plain: &[u8], key: &[u8]) -> Result<Vec<u8>, Error> {
     let mut data = Vec::new();
 
@@ -15,6 +16,7 @@ pub fn repeating_xor(plain: &[u8], key: &[u8]) -> Result<Vec<u8>, Error> {
 
     Ok(data)
 }
+
 
 #[test]
 fn it_works() {

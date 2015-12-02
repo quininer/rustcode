@@ -1,10 +1,11 @@
 extern crate rustc_serialize;
-extern crate single_byte_xor_cipher;
 extern crate fixed_xor;
+extern crate single_byte_xor_cipher;
 
 use std::cmp::Ordering::Equal;
 use fixed_xor::xor_by;
 use single_byte_xor_cipher::{ analyse_frequency, FreqsMap };
+
 
 pub fn analyse_from_vec(
     ciphertexts: Vec<Vec<u8>>, fmap: FreqsMap
@@ -31,13 +32,12 @@ pub fn xor_from_vec(ciphertexts: Vec<Vec<u8>>, fmap: FreqsMap) -> Vec<u8> {
 }
 
 
-
 #[test]
 fn it_works() {
-    use single_byte_xor_cipher::read_freqsmap;
-    use rustc_serialize::hex::FromHex;
     use std::fs::File;
     use std::io::Read;
+    use rustc_serialize::hex::FromHex;
+    use single_byte_xor_cipher::read_freqsmap;
 
     let path = "./examples/4.txt";
     let mut data = String::new();

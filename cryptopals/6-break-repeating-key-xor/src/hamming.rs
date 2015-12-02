@@ -3,6 +3,7 @@
 use std::ops::Range;
 use std::cmp::Ordering::Equal;
 
+
 const M1: u8 = 0x5555555555555555; //binary: 0101...
 const M2: u8 = 0x3333333333333333; //binary: 00110011..
 const M4: u8 = 0x0f0f0f0f0f0f0f0f; //binary:  4 zeros,  4 ones ...

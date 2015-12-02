@@ -3,6 +3,7 @@ extern crate rustc_serialize;
 use std::convert::From;
 use rustc_serialize::hex::{ FromHex, ToHex, FromHexError };
 
+
 #[derive(Copy, Clone, Debug)]
 pub enum Error {
     HexError(FromHexError),
@@ -40,6 +41,7 @@ pub fn xor_by_hex(x: &str, y: &str) -> Result<String, Error> {
         &try!(y.from_hex())
     ).map(|u| u.to_hex())
 }
+
 
 #[test]
 fn it_works() {

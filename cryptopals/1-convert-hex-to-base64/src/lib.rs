@@ -3,9 +3,11 @@ extern crate rustc_serialize;
 use rustc_serialize::hex::{ FromHex, FromHexError };
 use rustc_serialize::base64::{ STANDARD, ToBase64 };
 
+
 pub fn hextob64(s: &str) -> Result<String, FromHexError> {
     Ok(try!(s.from_hex()).to_base64(STANDARD))
 }
+
 
 #[test]
 fn it_works() {

@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use rustc_serialize::hex::{ FromHex, FromHexError };
 use fixed_xor::xor_by;
 
+
 #[derive(Debug)]
 pub enum Error {
     HexError(FromHexError),
@@ -80,6 +81,7 @@ pub fn analyse_frequency(
 pub fn xor_by_max(v: Vec<u8>, fmap: FreqsMap) -> Vec<u8> {
     xor_by(&v, analyse_frequency(&v, fmap)[0].0)
 }
+
 
 #[test]
 fn it_works() {
