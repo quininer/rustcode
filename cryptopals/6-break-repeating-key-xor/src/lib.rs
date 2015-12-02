@@ -5,6 +5,9 @@ pub mod hamming;
 
 use fixed_xor::{ xor, Error };
 
+pub fn guess_key() {
+    //
+}
 
 #[test]
 fn it_works() {

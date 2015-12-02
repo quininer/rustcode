@@ -1,5 +1,6 @@
 #![allow(dead_code, unused_variables, overflowing_literals)]
 
+use std::ops::Range;
 use std::cmp::Ordering::Equal;
 
 const M1: u8 = 0x5555555555555555; //binary: 0101...
@@ -14,7 +15,7 @@ const H01: u8 = 0x0101010101010101; //the sum of 256 to the power of 0,1,2,3...
 pub enum Error {
     MinError,
     LengthError,
-    CipherTooShort
+    CipherTextTooShort
 }
 
 pub fn weight(x: u8) -> u8 {
@@ -53,7 +54,7 @@ pub fn distance(x: &[u8], y: &[u8]) -> Result<usize, Error> {
 
 pub fn possibility(ciphertext: &[u8], size: usize) -> Result<f64, Error> {
     if ciphertext.len() < size * 2 {
-        return Err(Error::CipherTooShort);
+        return Err(Error::CipherTextTooShort);
     }
 
     let mut p = 0.0;
@@ -69,9 +70,9 @@ pub fn possibility(ciphertext: &[u8], size: usize) -> Result<f64, Error> {
     Ok(p  / (ln.len() - 1) as f64)
 }
 
-pub fn guess_keysize(
-    ciphertext: &[u8], r: ::std::ops::Range<usize>
-) -> Result<usize, Error> {
+pub fn guess_keysizes(
+    ciphertext: &[u8], r: Range<usize>
+) -> Result<Vec<(usize, f64)>, Error> {
     let mut rr = Vec::new();
 
     for n in r {
@@ -79,7 +80,14 @@ pub fn guess_keysize(
     }
 
     rr.sort_by(|&(_, n), &(_, m)| n.partial_cmp(&m).unwrap_or(Equal));
-    rr
+
+    Ok(rr)
+}
+
+pub fn guess_keysize(
+    ciphertext: &[u8], r: Range<usize>
+) -> Result<usize, Error> {
+    try!(guess_keysizes(ciphertext, r))
         .first()
         .map(|&(n, _)| n)
         .ok_or(Error::MinError)

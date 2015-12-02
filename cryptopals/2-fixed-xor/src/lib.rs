@@ -28,7 +28,13 @@ pub fn xor(x: &[u8], y: &[u8]) -> Result<Vec<u8>, Error> {
     }
 }
 
-pub fn hexor(x: &str, y: &str) -> Result<String, Error> {
+pub fn xor_by(x: &[u8], y: u8) -> Vec<u8> {
+    x.iter()
+        .map(|x| x ^ y)
+        .collect()
+}
+
+pub fn xor_by_hex(x: &str, y: &str) -> Result<String, Error> {
     xor(
         &try!(x.from_hex()),
         &try!(y.from_hex())
@@ -38,7 +44,7 @@ pub fn hexor(x: &str, y: &str) -> Result<String, Error> {
 #[test]
 fn it_works() {
     assert_eq!(
-        hexor(
+        xor_by_hex(
             "1c0111001f010100061a024b53535009181c",
             "686974207468652062756c6c277320657965"
         ).ok(),
