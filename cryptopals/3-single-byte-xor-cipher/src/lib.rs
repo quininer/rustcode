@@ -1,13 +1,12 @@
 extern crate rustc_serialize;
 extern crate fixed_xor;
 
-use std::io;
 use std::fs::File;
-use std::io::Read;
 use std::path::Path;
 use std::num::ParseFloatError;
 use std::cmp::Ordering::Equal;
 use std::collections::HashMap;
+use std::io::{ Read, Error as IoError };
 use rustc_serialize::hex::{ FromHex, FromHexError };
 use fixed_xor::xor_by;
 
@@ -15,7 +14,7 @@ use fixed_xor::xor_by;
 #[derive(Debug)]
 pub enum Error {
     HexError(FromHexError),
-    IoError(io::Error),
+    IoError(IoError),
     ParseError(Option<ParseFloatError>),
 }
 
@@ -25,8 +24,8 @@ impl From<FromHexError> for Error {
     }
 }
 
-impl From<io::Error> for Error {
-    fn from(err: io::Error) -> Error {
+impl From<IoError> for Error {
+    fn from(err: IoError) -> Error {
         Error::IoError(err)
     }
 }
@@ -40,7 +39,8 @@ impl From<ParseFloatError> for Error {
 pub type FreqsMap = HashMap<u8, f64>;
 
 pub fn read_freqsmap<P: AsRef<Path>>(path: P) -> Result<FreqsMap, Error> {
-    let mut fmap = HashMap::new();
+    let mut fmap = FreqsMap::new();
+
     let mut data = String::new();
     try!(try!(File::open(path)).read_to_string(&mut data));
 
