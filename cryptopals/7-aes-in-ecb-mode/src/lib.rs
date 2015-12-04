@@ -1,7 +1,7 @@
 extern crate rustc_serialize;
 extern crate openssl;
 
-use openssl::crypto::symm::{ Crypter };
+use openssl::crypto::symm::Crypter;
 
 
 pub fn repeating_crypt(crypter: Crypter, data: &[u8], size: usize) -> Vec<u8> {

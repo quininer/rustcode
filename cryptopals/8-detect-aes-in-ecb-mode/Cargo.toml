@@ -1,0 +1,8 @@
+[package]
+name = "detect-aes-in-ecb-mode"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies]
+rustc-serialize = "*"
+itertools = "*"
