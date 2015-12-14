@@ -1,5 +1,5 @@
 [package]
-name = "10-implement-cbc-mode"
+name = "implement-cbc-mode"
 version = "0.1.0"
 authors = ["quininer <quininer@live.com>"]
 

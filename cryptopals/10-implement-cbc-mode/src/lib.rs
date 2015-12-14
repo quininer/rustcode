@@ -13,8 +13,8 @@ pub struct AesCBC {
 }
 
 impl AesCBC {
-    pub fn new(key: Vec<u8>, iv: Vec<u8>) -> AesCBC {
-        AesCBC { key: key, iv: iv }
+    pub fn new(key: &[u8], iv: &[u8]) -> AesCBC {
+        AesCBC { key: key.to_vec(), iv: iv.to_vec() }
     }
 
     pub fn set_iv(&mut self, iv: &[u8]) {
@@ -67,7 +67,7 @@ fn it_works() {
     data = data.replace("\n", "");
     let data = data.from_base64().unwrap();
 
-    let mut aescbc = AesCBC::new(key.to_vec(), iv.to_vec());
+    let mut aescbc = AesCBC::new(key, iv);
     let plaintext = aescbc.update(Mode::Decrypt, &data);
 
     aescbc.set_iv(iv);

@@ -1,0 +1,11 @@
+[package]
+name = "an-ebccbc-detection-oracle"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies.detect-aes-in-ecb-mode]
+path = "../8-detect-aes-in-ecb-mode"
+
+[dependencies]
+rand = "*"
+openssl = "*"
