@@ -7,6 +7,7 @@ use openssl::crypto::symm::{ Crypter, Type, Mode };
 use fixed_xor::xor;
 use implement_pkcs7_padding::pksc7padding;
 
+
 pub struct AesCBC {
     key: Vec<u8>,
     iv: Vec<u8>
@@ -26,24 +27,22 @@ impl AesCBC {
         crypter.init(mode, &self.key, &Vec::new());
         crypter.pad(false);
         data.chunks(self.key.len())
-            .map(|u| {
-                match mode {
-                    Mode::Encrypt => {
-                        let text = crypter.update(&xor(
-                            &pksc7padding(u, self.key.len()),
-                            &self.iv
-                        ).unwrap());
-                        self.set_iv(&text);
-                        text
-                    },
-                    Mode::Decrypt => {
-                        let iv = self.iv.clone();
-                        self.set_iv(u);
-                        xor(
-                            &crypter.update(&pksc7padding(u, self.key.len())),
-                            &iv
-                        ).unwrap()
-                    }
+            .map(|u| match mode {
+                Mode::Encrypt => {
+                    let text = crypter.update(&xor(
+                        &pksc7padding(u, self.key.len()),
+                        &self.iv
+                    ).unwrap());
+                    self.set_iv(&text);
+                    text
+                },
+                Mode::Decrypt => {
+                    let iv = self.iv.clone();
+                    self.set_iv(u);
+                    xor(
+                        &crypter.update(&pksc7padding(u, self.key.len())),
+                        &iv
+                    ).unwrap()
                 }
             })
             .collect::<Vec<Vec<u8>>>()

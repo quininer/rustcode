@@ -3,6 +3,7 @@ extern crate itertools;
 
 use itertools::Itertools;
 
+
 pub fn repetition_rate(data: Vec<u8>, size: usize) -> usize {
     let mut count = 0;
 
@@ -16,6 +17,7 @@ pub fn repetition_rate(data: Vec<u8>, size: usize) -> usize {
 
     count
 }
+
 
 #[test]
 fn it_works() {

@@ -5,16 +5,27 @@ extern crate detect_aes_in_ecb_mode;
 use rand::{ random, sample, thread_rng, Rng };
 use openssl::crypto::symm::{ Crypter, Type, Mode };
 
+
+#[macro_export]
+macro_rules! rand {
+    ( $len:expr ) => {
+        thread_rng().gen_iter().take($len).collect::<Vec<u8>>()
+    };
+    ( choose $range:expr ) => {
+        sample(&mut thread_rng(), $range, 1)[0]
+    };
+    () => { rand!(16) }
+}
+
 pub fn encryption_oracle(data: Vec<u8>) -> (bool, (Vec<u8>, Vec<u8>)) {
-    let prefix = thread_rng().gen_iter::<u8>()
-        .take(sample(&mut thread_rng(), 5..10, 1)[0]).collect::<Vec<u8>>();
-    let suffix = thread_rng().gen_iter::<u8>()
-        .take(sample(&mut thread_rng(), 5..10, 1)[0]).collect::<Vec<u8>>();
+    let data = [
+        rand!(rand!(choose 5..10)),
+        data,
+        rand!(rand!(choose 5..10))
+    ].concat();
 
-    let data = [prefix, data, suffix].concat();
-
-    let key = thread_rng().gen_iter::<u8>().take(16).collect::<Vec<u8>>();
-    let iv = thread_rng().gen_iter::<u8>().take(16).collect::<Vec<u8>>();
+    let key = rand!();
+    let iv = rand!();
 
     let ebc = Crypter::new(Type::AES_128_ECB);
     let cbc = Crypter::new(Type::AES_128_CBC);
@@ -31,6 +42,7 @@ pub fn encryption_oracle(data: Vec<u8>) -> (bool, (Vec<u8>, Vec<u8>)) {
     (x, (x1.update(one), x2.update(two)))
 }
 
+
 #[test]
 fn it_works() {
     use detect_aes_in_ecb_mode::repetition_rate;
@@ -39,7 +51,7 @@ fn it_works() {
     let mut count = 0;
 
     for _ in 0..total {
-        let (r, (data1, data2)) = encryption_oracle(vec![random::<u8>(); 96]);
+        let (r, (data1, data2)) = encryption_oracle(vec![random(); 96]);
         if (repetition_rate(data1, 16) > repetition_rate(data2, 16)) == r {
             count += 1;
         };
