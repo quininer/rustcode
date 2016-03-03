@@ -4,18 +4,20 @@ extern crate itertools;
 use itertools::Itertools;
 
 
-pub fn repetition_rate(data: Vec<u8>, size: usize) -> usize {
+pub fn repetition_rate(data: &[u8], size: usize) -> f64 {
+    let mut total = 0;
     let mut count = 0;
 
     for (x, y) in data.chunks(size).combinations() {
         for (n, m) in x.iter().zip(y.iter()) {
+            total += 1;
             if n == m {
                 count += 1;
             }
         }
     }
 
-    count
+    count as f64 / total as f64
 }
 
 
@@ -33,10 +35,10 @@ fn it_works() {
     File::open(path).expect("read error.").read_to_string(&mut data).ok();
     let mut datas = data.lines()
         .map(|s| s.from_hex().ok().unwrap())
-        .map(|s| (s.clone(), repetition_rate(s, keysize)))
-        .collect::<Vec<(Vec<u8>, usize)>>();
+        .map(|s| (s.clone(), repetition_rate(&s, keysize)))
+        .collect::<Vec<(Vec<u8>, f64)>>();
 
-    datas.sort_by(|&(_, n), &(_, m)| m.cmp(&n));
+    datas.sort_by(|&(_, n), &(_, m)| m.partial_cmp(&n).unwrap());
 
     let (target, _) = datas.first().unwrap().clone();
 

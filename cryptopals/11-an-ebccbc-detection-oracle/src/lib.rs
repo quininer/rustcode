@@ -17,7 +17,7 @@ macro_rules! rand {
     () => { rand!(16) }
 }
 
-pub fn encryption_oracle(data: Vec<u8>) -> (bool, (Vec<u8>, Vec<u8>)) {
+pub fn encryption_oracle(data: Vec<u8>) -> (bool, Vec<u8>) {
     let data = [
         rand!(rand!(choose 5..10)),
         data,
@@ -25,21 +25,21 @@ pub fn encryption_oracle(data: Vec<u8>) -> (bool, (Vec<u8>, Vec<u8>)) {
     ].concat();
 
     let key = rand!();
-    let iv = rand!();
 
-    let ebc = Crypter::new(Type::AES_128_ECB);
-    let cbc = Crypter::new(Type::AES_128_CBC);
-    ebc.init(Mode::Encrypt, &key, &[]);
-    cbc.init(Mode::Encrypt, &key, &iv);
-
-    let (one, two) = data.split_at(data.len() / 2);
-    let (x, (x1, x2)) = if random() {
-        (true, (ebc, cbc))
+    let (x, c) = if random() {
+        let ecb = Crypter::new(Type::AES_128_ECB);
+        ecb.init(Mode::Encrypt, &key, &[]);
+        ecb.pad(true);
+        (true, ecb)
     } else {
-        (false, (cbc, ebc))
+        let iv = rand!();
+        let cbc = Crypter::new(Type::AES_128_CBC);
+        cbc.init(Mode::Encrypt, &key, &iv);
+        cbc.pad(true);
+        (false, cbc)
     };
 
-    (x, (x1.update(one), x2.update(two)))
+    (x, c.update(&data))
 }
 
 
@@ -51,11 +51,11 @@ fn it_works() {
     let mut count = 0;
 
     for _ in 0..total {
-        let (r, (data1, data2)) = encryption_oracle(vec![random(); 96]);
-        if (repetition_rate(data1, 16) > repetition_rate(data2, 16)) == r {
+        let (r, data) = encryption_oracle(vec![random(); rand!(choose 32..96)]);
+        if (repetition_rate(&data, 16) > 0.3) == r {
             count += 1;
-        };
+        }
     }
 
-    assert!(count as f64 / total as f64 >= 0.5);
+    assert!(count as f64 / total as f64 > 0.7);
 }
