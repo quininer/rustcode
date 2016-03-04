@@ -1,0 +1,15 @@
+[package]
+name = "byte-at-a-time-ecb-decryption-simple"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.detect-aes-in-ecb-mode]
+path = "../8-detect-aes-in-ecb-mode"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]
+rustc-serialize = "*"
+rand = "*"
+openssl = "*"
