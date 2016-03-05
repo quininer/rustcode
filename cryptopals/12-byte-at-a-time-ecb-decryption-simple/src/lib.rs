@@ -78,12 +78,13 @@ fn it_works() {
 
     let data = "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK";
     let data = data.from_base64().unwrap();
+
     let oracle = Oracle::new(&data);
 
     let blocksize = crack_blocksize(&oracle);
 
     let _ = if repetition_rate(
-        &oracle.encryption(&vec![0; blocksize * (data.len() / blocksize) * 4]),
+        &oracle.encryption(&vec![0; blocksize * (&oracle.encryption(b"").len() / blocksize) * 4]),
         blocksize
     ) > 0.5 { Type::AES_128_ECB } else { panic!() };
 
