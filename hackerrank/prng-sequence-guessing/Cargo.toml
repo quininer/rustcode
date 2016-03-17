@@ -1,0 +1,6 @@
+[package]
+name = "prng-sequence-guessing"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies]
