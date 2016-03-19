@@ -1,0 +1,10 @@
+[package]
+name = "ecb-cut-and-paste"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies]
+url = "0.5"
+
+[dependencies.byte-at-a-time-ecb-decryption-simple]
+path = "../12-byte-at-a-time-ecb-decryption-simple"
