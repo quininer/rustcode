@@ -12,6 +12,16 @@ pub struct Oracle {
     data: Vec<u8>
 }
 
+/// ```
+/// use byte_at_a_time_ecb_decryption_simple::Oracle;
+/// let oracle = Oracle::new(&[]);
+/// let data = b"byte_at_a_time_ecb_decryption_simple::Oracle;";
+///
+/// assert_eq!(
+///     oracle.decryption(&oracle.encryption(data)),
+///     data.to_vec()
+/// )
+/// ```
 impl Oracle {
     pub fn new(data: &[u8]) -> Oracle {
         Oracle {
@@ -24,7 +34,15 @@ impl Oracle {
         let ecb = Crypter::new(Type::AES_128_ECB);
         ecb.init(Mode::Encrypt, &self.key, &[]);
         ecb.pad(true);
-        ecb.update(&[data, self.data.as_ref()].concat())
+        let d = [data, self.data.as_ref()].concat();
+        [ecb.update(&d), ecb.finalize()].concat()
+    }
+
+    pub fn decryption(&self, data: &[u8]) -> Vec<u8> {
+        let ecb = Crypter::new(Type::AES_128_ECB);
+        ecb.init(Mode::Decrypt, &self.key, &[]);
+        ecb.pad(true);
+        [ecb.update(data), ecb.finalize()].concat()
     }
 }
 
@@ -44,7 +62,7 @@ pub fn crack_nextbyte(blocksize: usize, known: &[u8], oracle: &Oracle) -> Result
     let padding = vec![0; blocksize - (known.len() % blocksize) - 1];
     let bs = padding.len() + known.len() + 1;
     let paddinged = oracle.encryption(&padding);
-    if paddinged.len() < padding.len() + known.len() + 1 {
+    if paddinged.len() <= bs {
         return Err(());
     }
     for u in 0..std::u8::MAX {
@@ -62,8 +80,7 @@ pub fn crack_nextbyte(blocksize: usize, known: &[u8], oracle: &Oracle) -> Result
 pub fn crack_plaintext(blocksize: usize, oracle: &Oracle) -> Vec<u8> {
     let mut known = Vec::new();
     loop {
-        let k = known.clone();
-        match crack_nextbyte(blocksize, &k, oracle) {
+        match crack_nextbyte(blocksize, &known.clone(), oracle) {
             Ok(b) => known.push(b),
             Err(_) => break
         }
@@ -76,11 +93,10 @@ fn it_works() {
     use detect_aes_in_ecb_mode::repetition_rate;
     use rustc_serialize::base64::FromBase64;
 
-    let data = "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK";
+    let data = include_str!("input.txt");
     let data = data.from_base64().unwrap();
 
     let oracle = Oracle::new(&data);
-
     let blocksize = crack_blocksize(&oracle);
 
     let _ = if repetition_rate(
@@ -88,5 +104,8 @@ fn it_works() {
         blocksize
     ) > 0.5 { Type::AES_128_ECB } else { panic!() };
 
-    assert_eq!(&data, &crack_plaintext(blocksize, &oracle))
+    assert_eq!(
+        data,
+        crack_plaintext(blocksize, &oracle)
+    )
 }
