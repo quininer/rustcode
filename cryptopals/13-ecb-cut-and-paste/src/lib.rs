@@ -38,7 +38,7 @@ pub fn profile_for<D: AsRef<[u8]>>(input: D) -> String {
 fn it_works() {
     use byte_at_a_time_ecb_decryption_simple::Oracle;
 
-    let oracle = Oracle::new(&[]);
+    let oracle = Oracle::new(&[], &[]);
     let cipher = oracle.encryption(
         profile_for("foo@bar.cradmin+++++++++++ypt").as_ref()
     );

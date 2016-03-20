@@ -7,14 +7,16 @@ extern crate detect_aes_in_ecb_mode;
 use rand::{ thread_rng, Rng };
 use openssl::crypto::symm::{ Crypter, Type, Mode };
 
+
 pub struct Oracle {
+    prefix: Vec<u8>,
     key: Vec<u8>,
-    data: Vec<u8>
+    suffix: Vec<u8>
 }
 
 /// ```
 /// use byte_at_a_time_ecb_decryption_simple::Oracle;
-/// let oracle = Oracle::new(&[]);
+/// let oracle = Oracle::new(&[], &[]);
 /// let data = b"byte_at_a_time_ecb_decryption_simple::Oracle;";
 ///
 /// assert_eq!(
@@ -23,10 +25,11 @@ pub struct Oracle {
 /// )
 /// ```
 impl Oracle {
-    pub fn new(data: &[u8]) -> Oracle {
+    pub fn new(prefix: &[u8], suffix: &[u8]) -> Oracle {
         Oracle {
+            prefix: prefix.into(),
             key: rand!(),
-            data: data.into()
+            suffix: suffix.into()
         }
     }
 
@@ -34,7 +37,11 @@ impl Oracle {
         let ecb = Crypter::new(Type::AES_128_ECB);
         ecb.init(Mode::Encrypt, &self.key, &[]);
         ecb.pad(true);
-        let d = [data, self.data.as_ref()].concat();
+        let d = [
+            self.prefix.as_ref(),
+            data,
+            self.suffix.as_ref()
+        ].concat();
         [ecb.update(&d), ecb.finalize()].concat()
     }
 
@@ -46,43 +53,40 @@ impl Oracle {
     }
 }
 
-pub fn crack_blocksize(oracle: &Oracle) -> usize {
-    let l = oracle.encryption(b"").len();
-    let mut i = 1;
+pub fn crack_blocksize(oracle: &Oracle) -> (usize, usize) {
+    let l = oracle.encryption(&[]).len();
+    let mut p = 1;
     loop {
-        let s = oracle.encryption(&vec![0; i]).len();
-        if s != l {
-            return s - l;
+        let pd = oracle.encryption(&vec![0; p]).len();
+        if pd != l {
+            return (pd - l, p);
         }
-        i += 1;
+        p += 1;
     }
 }
 
-pub fn crack_nextbyte(blocksize: usize, known: &[u8], oracle: &Oracle) -> Result<u8, ()> {
-    let padding = vec![0; blocksize - (known.len() % blocksize) - 1];
-    let bs = padding.len() + known.len() + 1;
+pub fn crack_nextbyte((offset, i): (usize, usize), bs: usize, known: &[u8], oracle: &Oracle) -> Option<u8> {
+    let padding = vec![0; i + bs - (known.len() % bs) - 1];
+    let pbs = offset - i + padding.len() + known.len() + 1;
     let paddinged = oracle.encryption(&padding);
-    if paddinged.len() <= bs {
-        return Err(());
+    if paddinged.len() <= pbs {
+        return None;
     }
-    for u in 0..std::u8::MAX {
-        if &paddinged[..bs] == &oracle.encryption(&[
+    (0..std::u8::MAX).find(
+        |u| &paddinged[offset..pbs] == &oracle.encryption(&[
             padding.as_ref(),
             known,
-            vec![u].as_ref()
-        ].concat())[..bs] {
-            return Ok(u);
-        }
-    }
-    Err(())
+            &[*u]
+        ].concat())[offset..pbs]
+    )
 }
 
-pub fn crack_plaintext(blocksize: usize, oracle: &Oracle) -> Vec<u8> {
+pub fn crack_plaintext(offset: (usize, usize), bs: usize, oracle: &Oracle) -> Vec<u8> {
     let mut known = Vec::new();
     loop {
-        match crack_nextbyte(blocksize, &known.clone(), oracle) {
-            Ok(b) => known.push(b),
-            Err(_) => break
+        match crack_nextbyte(offset, bs, &known.clone(), oracle) {
+            Some(b) => known.push(b),
+            None => break
         }
     }
     known
@@ -96,16 +100,16 @@ fn it_works() {
     let data = include_str!("input.txt");
     let data = data.from_base64().unwrap();
 
-    let oracle = Oracle::new(&data);
-    let blocksize = crack_blocksize(&oracle);
+    let oracle = Oracle::new(&[], &data);
+    let (bs, _) = crack_blocksize(&oracle);
 
     let _ = if repetition_rate(
-        &oracle.encryption(&vec![0; blocksize * (&oracle.encryption(b"").len() / blocksize) * 4]),
-        blocksize
+        &oracle.encryption(&vec![0; bs * (&oracle.encryption(b"").len() / bs) * 4]),
+        bs
     ) > 0.5 { Type::AES_128_ECB } else { panic!() };
 
     assert_eq!(
         data,
-        crack_plaintext(blocksize, &oracle)
+        crack_plaintext((0, 0), bs, &oracle)
     )
 }
