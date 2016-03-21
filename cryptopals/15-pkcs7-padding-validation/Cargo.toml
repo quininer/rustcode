@@ -1,0 +1,4 @@
+[package]
+name = "pkcs7-padding-validation"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
