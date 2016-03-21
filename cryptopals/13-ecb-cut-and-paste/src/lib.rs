@@ -4,6 +4,7 @@ extern crate byte_at_a_time_ecb_decryption_simple;
 use std::collections::HashMap;
 use url::form_urlencoded;
 
+
 /// ```
 /// use ecb_cut_and_paste::parse_profile;
 /// assert_eq!(
@@ -39,10 +40,10 @@ fn it_works() {
     use byte_at_a_time_ecb_decryption_simple::Oracle;
 
     let oracle = Oracle::new(&[], &[]);
-    let cipher = oracle.encryption(
+    let cipher = oracle.encrypt(
         profile_for("foo@bar.cradmin+++++++++++ypt").as_ref()
     );
-    let pdata = oracle.decryption(&[
+    let pdata = oracle.decrypt(&[
         &cipher[..16],
         &cipher[32..48],
         &cipher[16..32],

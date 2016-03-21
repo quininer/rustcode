@@ -1,13 +1,16 @@
 [package]
-name = "byte-at-a-time-ecb-decryption-harder"
+name = "cbc-bitflipping-attacks"
 version = "0.1.0"
 authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-cbc-mode]
+path = "../10-implement-cbc-mode"
 
 [dependencies.an-ebccbc-detection-oracle]
 path = "../11-an-ebccbc-detection-oracle"
 
-[dependencies.byte-at-a-time-ecb-decryption-simple]
-path = "../12-byte-at-a-time-ecb-decryption-simple"
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
 
 [dependencies]
-rustc-serialize = "*"
+url = "0.5"

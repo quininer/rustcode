@@ -1,10 +1,8 @@
-extern crate rand;
 extern crate openssl;
 extern crate rustc_serialize;
 extern crate detect_aes_in_ecb_mode;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
-use rand::{ thread_rng, Rng };
 use openssl::crypto::symm::{ Crypter, Type, Mode };
 
 
@@ -20,7 +18,7 @@ pub struct Oracle {
 /// let data = b"byte_at_a_time_ecb_decryption_simple::Oracle;";
 ///
 /// assert_eq!(
-///     oracle.decryption(&oracle.encryption(data)),
+///     oracle.decrypt(&oracle.encrypt(data)),
 ///     data.to_vec()
 /// )
 /// ```
@@ -33,7 +31,7 @@ impl Oracle {
         }
     }
 
-    pub fn encryption(&self, data: &[u8]) -> Vec<u8> {
+    pub fn encrypt(&self, data: &[u8]) -> Vec<u8> {
         let ecb = Crypter::new(Type::AES_128_ECB);
         ecb.init(Mode::Encrypt, &self.key, &[]);
         ecb.pad(true);
@@ -45,7 +43,7 @@ impl Oracle {
         [ecb.update(&d), ecb.finalize()].concat()
     }
 
-    pub fn decryption(&self, data: &[u8]) -> Vec<u8> {
+    pub fn decrypt(&self, data: &[u8]) -> Vec<u8> {
         let ecb = Crypter::new(Type::AES_128_ECB);
         ecb.init(Mode::Decrypt, &self.key, &[]);
         ecb.pad(true);
@@ -54,10 +52,10 @@ impl Oracle {
 }
 
 pub fn crack_blocksize(oracle: &Oracle) -> (usize, usize) {
-    let l = oracle.encryption(&[]).len();
+    let l = oracle.encrypt(&[]).len();
     let mut p = 1;
     loop {
-        let pd = oracle.encryption(&vec![0; p]).len();
+        let pd = oracle.encrypt(&vec![0; p]).len();
         if pd != l {
             return (pd - l, p);
         }
@@ -68,12 +66,12 @@ pub fn crack_blocksize(oracle: &Oracle) -> (usize, usize) {
 pub fn crack_nextbyte((offset, i): (usize, usize), bs: usize, known: &[u8], oracle: &Oracle) -> Option<u8> {
     let padding = vec![0; i + bs - (known.len() % bs) - 1];
     let pbs = offset - i + padding.len() + known.len() + 1;
-    let paddinged = oracle.encryption(&padding);
+    let paddinged = oracle.encrypt(&padding);
     if paddinged.len() <= pbs {
         return None;
     }
     (0..std::u8::MAX).find(
-        |u| &paddinged[offset..pbs] == &oracle.encryption(&[
+        |u| &paddinged[offset..pbs] == &oracle.encrypt(&[
             padding.as_ref(),
             known,
             &[*u]
@@ -104,7 +102,7 @@ fn it_works() {
     let (bs, _) = crack_blocksize(&oracle);
 
     let _ = if repetition_rate(
-        &oracle.encryption(&vec![0; bs * (&oracle.encryption(b"").len() / bs) * 4]),
+        &oracle.encrypt(&vec![0; bs * (&oracle.encrypt(b"").len() / bs) * 4]),
         bs
     ) > 0.5 { Type::AES_128_ECB } else { panic!() };
 

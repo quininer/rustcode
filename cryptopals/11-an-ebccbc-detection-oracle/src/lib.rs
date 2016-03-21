@@ -2,17 +2,18 @@ extern crate rand;
 extern crate openssl;
 extern crate detect_aes_in_ecb_mode;
 
-use rand::{ random, sample, thread_rng, Rng };
+pub use rand::{ random, sample, thread_rng, Rng };
 use openssl::crypto::symm::{ Crypter, Type, Mode };
 
 
 #[macro_export]
 macro_rules! rand {
-    ( $len:expr ) => {
-        thread_rng().gen_iter().take($len).collect::<Vec<u8>>()
-    };
+    ( $len:expr ) => {{
+        use $crate::Rng;
+        $crate::thread_rng().gen_iter().take($len).collect::<Vec<u8>>()
+    }};
     ( choose $range:expr ) => {
-        sample(&mut thread_rng(), $range, 1)[0]
+        $crate::sample(&mut $crate::thread_rng(), $range, 1)[0]
     };
     () => { rand!(16) }
 }

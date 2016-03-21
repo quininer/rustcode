@@ -4,6 +4,21 @@ use std::convert::From;
 use rustc_serialize::hex::{ FromHex, ToHex, FromHexError };
 
 
+#[macro_export]
+macro_rules! xor {
+    ( $( $bytes:expr ),* ) => {{
+        let mut list = Vec::new();
+        $( list.push($bytes); )*
+        let first = list.pop().unwrap();
+        list.iter().fold(
+            first.into(),
+            |out, next|
+                $crate::xor(&out, &next)
+                    .unwrap()
+        )
+    }}
+}
+
 #[derive(Copy, Clone, Debug)]
 pub enum Error {
     HexError(FromHexError),

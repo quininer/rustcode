@@ -11,5 +11,4 @@ path = "../11-an-ebccbc-detection-oracle"
 
 [dependencies]
 rustc-serialize = "*"
-rand = "*"
 openssl = "*"

@@ -3,7 +3,8 @@ extern crate openssl;
 extern crate fixed_xor;
 extern crate implement_pkcs7_padding;
 
-use openssl::crypto::symm::{ Crypter, Type, Mode };
+pub use openssl::crypto::symm::Mode;
+use openssl::crypto::symm::{ Crypter, Type };
 use fixed_xor::xor;
 use implement_pkcs7_padding::pksc7padding;
 

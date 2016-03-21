@@ -1,11 +1,9 @@
-extern crate rand;
 extern crate rustc_serialize;
 extern crate byte_at_a_time_ecb_decryption_simple;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 #[test]
 fn it_works() {
-    use rand::{ thread_rng, sample, Rng };
     use rustc_serialize::base64::FromBase64;
     use byte_at_a_time_ecb_decryption_simple::{
         Oracle,
@@ -18,7 +16,7 @@ fn it_works() {
     let prefix = rand!(rand!(choose 0..std::u8::MAX as usize));
     let oracle = Oracle::new(&prefix, &data);
 
-    let empty_bs = oracle.encryption(&[]).len();
+    let empty_bs = oracle.encrypt(&[]).len();
     let (bs, i) = crack_blocksize(&oracle);
     assert_eq!(empty_bs, prefix.len() + data.len() + i);
 
