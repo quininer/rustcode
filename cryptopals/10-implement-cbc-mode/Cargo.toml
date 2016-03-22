@@ -3,9 +3,6 @@ name = "implement-cbc-mode"
 version = "0.1.0"
 authors = ["quininer <quininer@live.com>"]
 
-[dependencies.implement-pkcs7-padding]
-path = "../9-implement-pkcs7-padding"
-
 [dependencies.fixed-xor]
 path = "../2-fixed-xor"
 

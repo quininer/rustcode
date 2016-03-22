@@ -1,0 +1,16 @@
+[package]
+name = "17-the-cbc-padding-oracle"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.pkcs7-padding-validation]
+path = "../15-pkcs7-padding-validation"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
+[dependencies.implement-pkcs7-padding]
+path = "../9-implement-pkcs7-padding"

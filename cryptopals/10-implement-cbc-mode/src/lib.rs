@@ -1,12 +1,10 @@
 extern crate rustc_serialize;
 extern crate openssl;
 extern crate fixed_xor;
-extern crate implement_pkcs7_padding;
 
 pub use openssl::crypto::symm::Mode;
 use openssl::crypto::symm::{ Crypter, Type };
 use fixed_xor::xor;
-use implement_pkcs7_padding::pksc7padding;
 
 
 pub struct AesCBC {
@@ -31,7 +29,7 @@ impl AesCBC {
             .map(|u| match mode {
                 Mode::Encrypt => {
                     let text = crypter.update(&xor(
-                        &pksc7padding(u, self.key.len()),
+                        &u,
                         &self.iv
                     ).unwrap());
                     self.set_iv(&text);
@@ -41,7 +39,7 @@ impl AesCBC {
                     let iv = self.iv.clone();
                     self.set_iv(u);
                     xor(
-                        &crypter.update(&pksc7padding(u, self.key.len())),
+                        &crypter.update(&u),
                         &iv
                     ).unwrap()
                 }
@@ -64,7 +62,6 @@ fn it_works() {
 
     File::open("./examples/10.txt").expect("read error.")
         .read_to_string(&mut data).ok();
-    data = data.replace("\n", "");
     let data = data.from_base64().unwrap();
 
     let mut aescbc = AesCBC::new(key, iv);

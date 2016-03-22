@@ -1,4 +1,5 @@
 extern crate implement_cbc_mode;
+extern crate implement_pkcs7_padding;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 #[macro_use] extern crate fixed_xor;
 
@@ -12,8 +13,8 @@ pub struct Oracle {
 }
 
 impl Oracle {
-    pub fn new() -> Oracle  {
-        Oracle { key: rand!(16), iv: rand!(16) }
+    pub fn new(iv: &[u8]) -> Oracle  {
+        Oracle { key: rand!(), iv: iv.into() }
     }
 }
 
@@ -42,8 +43,8 @@ pub fn postdata<D: AsRef<[u8]>>(input: D) -> String {
 
 /// ```
 /// use cbc_bitflipping_attacks::{ Oracle, Cipher, is_admin };
-/// let oracle = Oracle::new();
-/// let input = oracle.encrypt(b"xxxxx;admin=true;xxxx");
+/// let oracle = Oracle::new(&[0; 16]);
+/// let input = oracle.encrypt(b"xxxx;admin=true;");
 /// assert!(is_admin(&oracle, &input));
 /// ```
 pub fn is_admin(oracle: &Oracle, input: &[u8]) -> bool {
@@ -73,9 +74,11 @@ pub fn crack_replace(plain: &[u8], cipher: &[u8], range: Range<usize>, text: &[u
 
 #[test]
 fn it_works() {
-    let oracle = Oracle::new();
+    use implement_pkcs7_padding::pkcs7padding;
+
+    let oracle = Oracle::new(&rand!());
     let text = postdata([b'x'; 32]);
-    let ciphertext = oracle.encrypt(&text.as_ref());
+    let ciphertext = oracle.encrypt(&pkcs7padding(&text.as_ref(), 16));
     let cracktext = crack_replace(
         &text.as_ref(),
         &ciphertext,
