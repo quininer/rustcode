@@ -7,6 +7,7 @@ use std::ops::Range;
 use implement_cbc_mode::{ AesCBC, Mode };
 
 
+#[derive(Clone)]
 pub struct Oracle {
     key: Vec<u8>,
     iv: Vec<u8>
@@ -20,6 +21,7 @@ impl Oracle {
 
 pub trait Cipher {
     fn encrypt(&self, data: &[u8]) -> Vec<u8>;
+    fn decrypt_with(&self, iv: &[u8], data: &[u8]) -> Vec<u8>;
     fn decrypt(&self, data: &[u8]) -> Vec<u8>;
 }
 
@@ -27,8 +29,11 @@ impl Cipher for Oracle {
     fn encrypt(&self, data: &[u8]) -> Vec<u8> {
         AesCBC::new(&self.key, &self.iv).update(Mode::Encrypt, data)
     }
+    fn decrypt_with(&self, iv: &[u8], data: &[u8]) -> Vec<u8> {
+        AesCBC::new(&self.key, &iv).update(Mode::Decrypt, data)
+    }
     fn decrypt(&self, data: &[u8]) -> Vec<u8> {
-        AesCBC::new(&self.key, &self.iv).update(Mode::Decrypt, data)
+        self.decrypt_with(&self.iv, data)
     }
 }
 
@@ -52,7 +57,7 @@ pub fn is_admin(oracle: &Oracle, input: &[u8]) -> bool {
         .contains(";admin=true;")
 }
 
-pub fn crack_replace(plain: &[u8], cipher: &[u8], range: Range<usize>, text: &[u8]) -> Vec<u8> {
+pub fn crack_cbc_replace(plain: &[u8], cipher: &[u8], range: Range<usize>, text: &[u8]) -> Vec<u8> {
     assert!(
         cipher.len() >= 32
             && plain.len() >= range.end
@@ -79,7 +84,7 @@ fn it_works() {
     let oracle = Oracle::new(&rand!());
     let text = postdata([b'x'; 32]);
     let ciphertext = oracle.encrypt(&pkcs7padding(&text.as_ref(), 16));
-    let cracktext = crack_replace(
+    let cracktext = crack_cbc_replace(
         &text.as_ref(),
         &ciphertext,
         48..64,

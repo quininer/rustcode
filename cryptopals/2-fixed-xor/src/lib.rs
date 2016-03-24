@@ -11,7 +11,7 @@ macro_rules! xor {
         $( list.push($bytes); )*
         let first = list.pop().unwrap();
         list.iter().fold(
-            first.into(),
+            first.to_vec(),
             |out, next|
                 $crate::xor(&out, &next)
                     .unwrap()

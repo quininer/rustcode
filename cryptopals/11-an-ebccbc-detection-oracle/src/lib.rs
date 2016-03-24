@@ -8,6 +8,7 @@ use openssl::crypto::symm::{ Crypter, Type, Mode };
 
 #[macro_export]
 macro_rules! rand {
+    ( x ) => { $crate::random() };
     ( $len:expr ) => {{
         use $crate::Rng;
         $crate::thread_rng().gen_iter().take($len).collect::<Vec<u8>>()

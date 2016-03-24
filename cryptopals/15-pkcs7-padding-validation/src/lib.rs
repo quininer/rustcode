@@ -12,7 +12,7 @@ pub fn unpksc7padding(data: &[u8], len: usize) -> Result<Vec<u8>, UnPksc7Err> {
     if pad as usize > len { Err(UnPksc7Err::BadPadding)? }
     let data_len = data.len() - (pad as usize);
 
-    if data[data_len..].is_empty() || data[data_len..].iter().all(|&r| r == pad) {
+    if !data[data_len..].is_empty() && data[data_len..].iter().all(|&r| r == pad) {
         Ok(data[..data_len].into())
     } else {
         Err(UnPksc7Err::BadPadding)
@@ -31,6 +31,10 @@ fn it_works() {
     );
     assert_eq!(
         unpksc7padding(b"ICE ICE BABY\x01\x02\x03\x04", 16).err(),
+        Some(UnPksc7Err::BadPadding)
+    );
+    assert_eq!(
+        unpksc7padding(b"ICE ICE BABYBAB\x00", 16).err(),
         Some(UnPksc7Err::BadPadding)
     );
 }

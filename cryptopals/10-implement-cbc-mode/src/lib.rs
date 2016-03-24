@@ -7,6 +7,7 @@ use openssl::crypto::symm::{ Crypter, Type };
 use fixed_xor::xor;
 
 
+#[derive(Clone)]
 pub struct AesCBC {
     key: Vec<u8>,
     iv: Vec<u8>

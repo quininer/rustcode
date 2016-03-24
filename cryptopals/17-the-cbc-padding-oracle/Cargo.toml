@@ -14,3 +14,6 @@ path = "../16-cbc-bitflipping-attacks"
 
 [dependencies.implement-pkcs7-padding]
 path = "../9-implement-pkcs7-padding"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
