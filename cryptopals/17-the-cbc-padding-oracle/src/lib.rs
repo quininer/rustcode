@@ -29,7 +29,6 @@ pub type Verifyer = Box<Fn(&[u8], &[u8]) -> bool>;
 
 pub fn is_qualified(oracle: &Oracle, iv: &[u8], data: &[u8]) -> bool {
     let out = oracle.decrypt_with(iv, data);
-    // println!("{:?}", out);
     unpksc7padding(&out, 16).is_ok()
 }
 
@@ -49,8 +48,8 @@ pub fn crack_cbc_block(iv: &[u8], data: &[u8], verify: &Verifyer) -> Result<Vec<
             ) && (!out.is_empty() || verify(
                 &xor!(
                     iv.to_vec(),
-                    leftpad!([&[u as u8], &out[..]].concat(), rand!(x)),
-                    leftpad!(vec![i as u8; i], rand!(x))
+                    leftpad!(vec![u as u8]),
+                    leftpad!(vec![i as u8; 2])
                 ),
                 data
             )))
