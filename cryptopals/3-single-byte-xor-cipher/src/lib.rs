@@ -60,17 +60,14 @@ pub fn read_freqsmap<P: AsRef<Path>>(path: P) -> Result<FreqsMap, Error> {
 }
 
 pub fn analyse_frequency(
-    ciphertext: &[u8], freqsmap: FreqsMap
+    ciphertext: &[u8], freqsmap: &FreqsMap
 ) -> Vec<(u8, f64)> {
     let mut ff = (0..255)
         .map(|s: u8| (s, xor_by(ciphertext, s)))
-        .map(
-            |(s, x)|
-                (s, x.iter().fold(
-                    0.0,
-                    |sum, n| sum + freqsmap.get(n).unwrap_or(&0.0)
-                ))
-        )
+        .map(|(s, x)| (s, x.iter().fold(
+            0.0,
+            |sum, n| sum + freqsmap.get(n).unwrap_or(&0.0)
+        )))
         .collect::<Vec<(u8, f64)>>();
 
     ff.sort_by(|&(_, n), &(_, m)| m.partial_cmp(&n).unwrap_or(Equal));
@@ -79,7 +76,7 @@ pub fn analyse_frequency(
 }
 
 pub fn xor_by_max(v: Vec<u8>, fmap: FreqsMap) -> Vec<u8> {
-    xor_by(&v, analyse_frequency(&v, fmap)[0].0)
+    xor_by(&v, analyse_frequency(&v, &fmap)[0].0)
 }
 
 

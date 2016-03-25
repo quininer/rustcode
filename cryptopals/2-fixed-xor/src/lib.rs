@@ -9,11 +9,10 @@ macro_rules! xor {
     ( $( $bytes:expr ),* ) => {{
         let mut list = Vec::new();
         $( list.push($bytes); )*
-        let first = list.pop().unwrap();
         list.iter().fold(
-            first.to_vec(),
+            vec![0; list[0].len()],
             |out, next|
-                $crate::xor(&out, &next)
+                $crate::xor(&out, &next[..out.len()])
                     .unwrap()
         )
     }}

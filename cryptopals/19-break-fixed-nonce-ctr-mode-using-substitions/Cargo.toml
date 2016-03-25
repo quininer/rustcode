@@ -1,0 +1,22 @@
+[package]
+name = "break-fixed-nonce-ctr-mode-using-substitions"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-ctr-the-stream-cipher-mode]
+path = "../18-implement-ctr-the-stream-cipher-mode"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies.break-repeating-key-xor]
+path = "../6-break-repeating-key-xor"
+
+[dependencies.single-byte-xor-cipher]
+path = "../3-single-byte-xor-cipher"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies]
+rustc-serialize = "*"

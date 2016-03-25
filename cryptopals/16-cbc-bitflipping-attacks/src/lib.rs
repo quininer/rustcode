@@ -66,13 +66,13 @@ pub fn crack_cbc_replace(plain: &[u8], cipher: &[u8], range: Range<usize>, text:
     );
 
     [
-        cipher[..range.start-16].to_vec(),
+        cipher[..range.start-16].into(),
         xor!(
             &cipher[range.start-16..range.end-16],
             &plain[range.clone()],
             text
         ),
-        cipher[range.end-16..].to_vec()
+        cipher[range.end-16..].into()
     ].concat()
 }
 

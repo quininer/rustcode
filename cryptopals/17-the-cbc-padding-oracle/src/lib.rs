@@ -63,18 +63,18 @@ pub fn crack_cbc_block(iv: &[u8], data: &[u8], verify: &Verifyer) -> Result<Vec<
 }
 
 pub fn crack_cbc_padding(iv: &[u8], data: &[u8], verify: Verifyer) -> Vec<u8> {
-    let mut out: Vec<u8> = iv.into();
+    let mut out: Vec<_> = iv.into();
     out.extend_from_slice(&data);
     out.chunks(iv.len())
         .map(|r| r.into())
-        .collect::<Vec<Vec<u8>>>()
+        .collect::<Vec<Vec<_>>>()
         .windows(2)
         .map(|r| crack_cbc_block(
             r.first().unwrap(),
             r.last().unwrap(),
             &verify
         ).unwrap())
-        .collect::<Vec<Vec<u8>>>()
+        .collect::<Vec<_>>()
         .concat()
 }
 
@@ -84,7 +84,7 @@ fn it_works() {
     use implement_pkcs7_padding::pkcs7padding;
 
     let input = include_str!("input.txt");
-    let input: Vec<u8> = rand!(choose input.lines()).into();
+    let input: Vec<_> = rand!(choose input.lines()).into();
     let iv = rand!();
     let oracle = Oracle::new(&iv);
 
@@ -98,6 +98,6 @@ fn it_works() {
     );
     assert_eq!(
         unpksc7padding(&output, 16).ok().or(Some(output)),
-        Some(input.into())
+        Some(input)
     );
 }

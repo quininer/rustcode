@@ -1,12 +1,12 @@
 extern crate rustc_serialize;
 extern crate openssl;
-extern crate fixed_xor;
+#[macro_use] extern crate fixed_xor;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use openssl::crypto::symm::{ Crypter, Type, Mode };
-use fixed_xor::xor;
 
 
+#[derive(Clone)]
 pub struct AesCTR {
     key: Vec<u8>,
     nonce: Vec<u8>,
@@ -32,18 +32,17 @@ impl AesCTR {
             .map(|u| {
                 let counter = self.counter;
                 self.counter += 1;
-                xor(
-                    &crypter.update(&[self.nonce.clone(), store64(counter)].concat())[..u.len()],
-                    u
-                ).unwrap()
+                xor!(
+                    u.into(),
+                    crypter.update(&[self.nonce.clone(), store64(counter)].concat())
+                )
             })
-            .collect::<Vec<Vec<u8>>>()
+            .collect::<Vec<_>>()
             .concat()
     }
 }
 
 pub fn store64(x: u64) -> Vec<u8> {
-    println!("{}", x);
     (0..8).map(|i| (x >> 8*i) as u8).collect()
 }
 

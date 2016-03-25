@@ -8,14 +8,14 @@ use single_byte_xor_cipher::{ analyse_frequency, FreqsMap };
 
 
 pub fn analyse_from_vec(
-    ciphertexts: Vec<Vec<u8>>, fmap: FreqsMap
+    ciphertexts: Vec<Vec<u8>>, fmap: &FreqsMap
 ) -> Vec<(u8, f64)> {
     ciphertexts.iter()
-        .map(|c| analyse_frequency(c, fmap.clone())[0])
+        .map(|c| analyse_frequency(c, &fmap)[0])
         .collect::<Vec<(u8, f64)>>()
 }
 
-pub fn xor_from_vec(ciphertexts: Vec<Vec<u8>>, fmap: FreqsMap) -> Vec<u8> {
+pub fn xor_from_vec(ciphertexts: Vec<Vec<u8>>, fmap: &FreqsMap) -> Vec<u8> {
     let mut tt = ciphertexts.iter()
         .zip(analyse_from_vec(ciphertexts.clone(), fmap).iter())
         .map(|(x, &(y, z))| (x.clone(), (y, z)))
@@ -50,7 +50,7 @@ fn it_works() {
     assert_eq!(
         String::from_utf8(xor_from_vec(
             ciphertexts,
-            read_freqsmap("../3-single-byte-xor-cipher/examples/english.txt").ok().unwrap()
+            &read_freqsmap("../3-single-byte-xor-cipher/examples/english.txt").ok().unwrap()
         )).ok(),
         Some(String::from("Now that the party is jumping\n"))
     );

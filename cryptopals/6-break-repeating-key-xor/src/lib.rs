@@ -30,14 +30,14 @@ pub fn zip<T: Clone>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
     z
 }
 
-pub fn guess_key(ciphertext: Vec<u8>, size: usize, fmap: FreqsMap) -> Vec<u8> {
+pub fn guess_key(ciphertext: Vec<u8>, size: usize, fmap: &FreqsMap) -> Vec<u8> {
     analyse_from_vec(
         zip(
             ciphertext
                 .chunks(size)
                 .filter(|v| v.len() == size)
-                .map(|v| v.to_vec())
-                .collect::<Vec<Vec<u8>>>()
+                .map(|v| v.into())
+                .collect()
         ),
         fmap
     ).iter()
@@ -67,7 +67,7 @@ fn it_works() {
     let key = guess_key(
         data,
         keysize,
-        read_freqsmap("../3-single-byte-xor-cipher/examples/english.txt").ok().unwrap()
+        &read_freqsmap("../3-single-byte-xor-cipher/examples/english.txt").ok().unwrap()
     );
 
     assert_eq!(
