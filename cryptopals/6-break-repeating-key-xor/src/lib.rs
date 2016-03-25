@@ -7,6 +7,7 @@ pub mod hamming;
 use single_byte_xor_cipher::FreqsMap;
 use detect_single_character_xor::analyse_from_vec;
 
+
 /// ```
 /// use break_repeating_key_xor::zip;
 /// assert_eq!(
@@ -15,19 +16,12 @@ use detect_single_character_xor::analyse_from_vec;
 /// );
 /// ```
 pub fn zip<T: Clone>(v: Vec<Vec<T>>) -> Vec<Vec<T>> {
-    let mut z = Vec::new();
-
-    for i in 0..v.first().unwrap().len() {
-        let mut zz = Vec::new();
-
-        for vv in &v {
-            zz.push(vv[i].clone());
-        }
-
-        z.push(zz);
-    }
-
-    z
+    (0..v.first().unwrap().len())
+        .map(|i| v.iter()
+             .map(|u| u[i].clone())
+             .collect()
+        )
+        .collect()
 }
 
 pub fn guess_key(ciphertext: Vec<u8>, size: usize, fmap: &FreqsMap) -> Vec<u8> {

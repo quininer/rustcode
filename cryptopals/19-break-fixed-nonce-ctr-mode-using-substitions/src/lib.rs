@@ -6,6 +6,16 @@ extern crate single_byte_xor_cipher;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 
+pub fn tailor_stram(data: &Vec<Vec<u8>>) -> (usize, Vec<Vec<u8>>) {
+    let minsize = data.iter().map(|r| r.len()).min().unwrap();
+    (
+        minsize,
+        data.iter()
+            .map(|r| r[..minsize].into())
+            .collect()
+    )
+}
+
 #[test]
 fn it_works() {
     use rustc_serialize::base64::FromBase64;
@@ -22,11 +32,7 @@ fn it_works() {
         .map(|r| crypter.clone().set_ctr(0).update(r))
         .collect::<Vec<Vec<u8>>>();
 
-    let minsize = ciphertexts.iter().map(|r| r.len()).min().unwrap();
-    let tailortexts = ciphertexts.iter()
-        .map(|r| r[..minsize].to_vec())
-        .collect::<Vec<Vec<u8>>>();
-
+    let (minsize, tailortexts) = tailor_stram(&ciphertexts);
     let streamkey = guess_key(
         tailortexts.concat(),
         minsize,
