@@ -58,4 +58,12 @@ fn it_works() {
         String::from_utf8_lossy(&AesCTR::from(b"YELLOW SUBMARINE", &[0; 8]).update(&input)),
         "Yo, VIP Let's kick it Ice, Ice, baby Ice, Ice, baby "
     );
+
+    let input = rand!(rand!(choose 5..45));
+    let mut crypter = AesCTR::new(&rand!());
+    let output = crypter.update(&input);
+    assert_eq!(
+        crypter.set_ctr(0).update(&output),
+        input
+    );
 }
