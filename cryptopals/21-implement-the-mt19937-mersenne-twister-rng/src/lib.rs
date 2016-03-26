@@ -23,6 +23,10 @@ impl MT19937 {
         rng
     }
 
+    pub fn from(state: &[u32; 624], index: usize) -> MT19937 {
+        MT19937 { mt: *state, index: index }
+    }
+
     fn gen(&mut self) {
         for i in 0..624 {
             let y = (self.mt[i] & 0x80000000) + (self.mt[(i+1) % 264] & 0x7fffffff);
@@ -38,16 +42,18 @@ impl MT19937 {
             self.gen();
         }
 
-        let mut y = self.mt[self.index];
-        y ^= y >> 11;
-        y ^= (y << 7) & 2636928640;
-        y ^= (y << 15) & 4022730752;
-        y ^= y >> 18;
-
+        let y = temper(self.mt[self.index]);
         self.index = (self.index + 1) % self.mt.len();
-
         y
     }
+}
+
+pub fn temper(mut y: u32) -> u32 {
+    y ^= y >> 11;
+    y ^= (y << 7) & 2636928640;
+    y ^= (y << 15) & 4022730752;
+    y ^= y >> 18;
+    y
 }
 
 impl Iterator for MT19937 {

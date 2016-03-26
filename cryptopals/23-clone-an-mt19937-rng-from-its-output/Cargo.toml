@@ -1,0 +1,10 @@
+[package]
+name = "clone-an-mt19937-rng-from-its-output"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-the-mt19937-mersenne-twister-rng]
+path = "../21-implement-the-mt19937-mersenne-twister-rng"
+
+[dependencies]
+time = "*"
