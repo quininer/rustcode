@@ -8,25 +8,25 @@ extern crate break_fixed_nonce_ctr_mode_using_substitions;
 use fixed_xor::xor_by;
 use break_repeating_key_xor::zip;
 
-pub fn guess_key(ciphertexts: Vec<Vec<u8>>, possible: &[u8], more: &[u8]) -> Vec<u8> {
+
+pub fn guess_key(ciphertexts: Vec<Vec<u8>>, tablet: &[u8], more: &[u8]) -> Vec<u8> {
     zip(ciphertexts).iter()
         .map(|r| {
             let out = (0..256)
                 .map(|u| u as u8)
                 .filter(|&u| !xor_by(r, u).iter()
-                    .any(|&n| !possible.contains(&n))
+                    .any(|&n| !tablet.contains(&n))
                 )
                 .collect::<Vec<u8>>();
             match out.len() {
                 0 => panic!("ooh.."),
                 1 => out[0],
                 _ => out.iter()
-                    .map(|&u| (
-                        xor_by(r, u).iter().filter(|&n| more.contains(n)).count(),
-                        u
-                    ))
-                    .max()
-                    .unwrap().1
+                    .cloned()
+                    .max_by_key(|&u| xor_by(r, u).iter()
+                        .filter(|&n| more.contains(n)).count()
+                    )
+                    .unwrap()
             }
         })
         .collect()
@@ -69,14 +69,14 @@ fn it_works() {
 
     let mut tested = false;
 
-    for (c, p) in ciphertexts.iter()
-        .zip(inputs.iter())
-        .filter(|&(c, p)| c.len() == minsize && p.len() == minsize)
+    for (p, c) in inputs.iter()
+        .map(|r| r[..minsize].to_vec())
+        .zip(ciphertexts.iter())
     {
         tested = true;
         assert_eq!(
-            String::from_utf8_lossy(&xor!(streamkey.clone(), c.clone())),
-            String::from_utf8_lossy(&p.clone())
+            xor!(streamkey.clone(), c.clone()),
+            p.clone()
         );
     }
 

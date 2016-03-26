@@ -22,11 +22,10 @@ pub enum Error {
 pub fn weight(x: u8) -> u8 {
     let x = (x & M1 ) + ((x >>  1) & M1); //put count of each  2 bits into those  2 bits
     let x = (x & M2 ) + ((x >>  2) & M2); //put count of each  4 bits into those  4 bits
-    let x = (x & M4 ) + ((x >>  4) & M4); //put count of each  8 bits into those  8 bits
+    (x & M4 ) + ((x >>  4) & M4) //put count of each  8 bits into those  8 bits
     // let x = (x & M8 ) + ((x >>  8) & M8 ); //put count of each 16 bits into those 16 bits
     // let x = (x & M16) + ((x >> 16) & M16); //put count of each 32 bits into those 32 bits
     // let x = (x & M32) + ((x >> 32) & M32); //put count of each 64 bits into those 64 bits
-    x
 }
 
 /// ```

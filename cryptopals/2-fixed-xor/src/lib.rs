@@ -20,13 +20,13 @@ macro_rules! xor {
 
 #[derive(Copy, Clone, Debug)]
 pub enum Error {
-    HexError(FromHexError),
-    LengthError
+    Hex(FromHexError),
+    Length
 }
 
 impl From<FromHexError> for Error {
     fn from(err: FromHexError) -> Error {
-        Error::HexError(err)
+        Error::Hex(err)
     }
 }
 
@@ -39,7 +39,7 @@ pub fn xor(x: &[u8], y: &[u8]) -> Result<Vec<u8>, Error> {
                 .collect()
         )
     } else {
-        Err(Error::LengthError)
+        Err(Error::Length)
     }
 }
 

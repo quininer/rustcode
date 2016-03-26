@@ -6,7 +6,7 @@ extern crate single_byte_xor_cipher;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 
-pub fn tailor_stram(data: &Vec<Vec<u8>>) -> (usize, Vec<Vec<u8>>) {
+pub fn tailor_stram(data: &[Vec<u8>]) -> (usize, Vec<Vec<u8>>) {
     let minsize = data.iter().map(|r| r.len()).min().unwrap();
     (
         minsize,
@@ -41,14 +41,15 @@ fn it_works() {
 
     let mut tested = false;
 
-    for (c, p) in ciphertexts.iter()
-        .zip(inputs.iter())
-        .filter(|&(c, p)| c.len() == minsize && p.len() == minsize)
+    for (p, c) in inputs.iter()
+        .map(|r| r[..minsize].to_vec())
+        .zip(ciphertexts.iter())
     {
         tested = true;
+
         // FIXME FreqsMap without capital letter
         assert_eq!(
-            String::from_utf8_lossy(&xor!(streamkey.clone(), c.clone())),
+            String::from_utf8_lossy(&xor!(streamkey.clone(), c.clone())).to_lowercase(),
             String::from_utf8_lossy(&p.clone()).to_lowercase()
         );
     }

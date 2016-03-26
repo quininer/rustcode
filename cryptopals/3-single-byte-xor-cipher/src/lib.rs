@@ -13,26 +13,26 @@ use fixed_xor::xor_by;
 
 #[derive(Debug)]
 pub enum Error {
-    HexError(FromHexError),
-    IoError(IoError),
-    ParseError(Option<ParseFloatError>),
+    Hex(FromHexError),
+    Io(IoError),
+    Parse(Option<ParseFloatError>),
 }
 
 impl From<FromHexError> for Error {
     fn from(err: FromHexError) -> Error {
-        Error::HexError(err)
+        Error::Hex(err)
     }
 }
 
 impl From<IoError> for Error {
     fn from(err: IoError) -> Error {
-        Error::IoError(err)
+        Error::Io(err)
     }
 }
 
 impl From<ParseFloatError> for Error {
     fn from(err: ParseFloatError) -> Error {
-        Error::ParseError(Some(err))
+        Error::Parse(Some(err))
     }
 }
 
@@ -48,11 +48,11 @@ pub fn read_freqsmap<P: AsRef<Path>>(path: P) -> Result<FreqsMap, Error> {
         .filter(|s| !(s.starts_with("//") || s.is_empty()))
         .map(|s| s.split_whitespace())
     {
-        let chr = try!(s.next().ok_or(Error::ParseError(None)));
-        let score = try!(s.next().ok_or(Error::ParseError(None)));
+        let chr = try!(s.next().ok_or(Error::Parse(None)));
+        let score = try!(s.next().ok_or(Error::Parse(None)));
 
         fmap.entry(
-            *try!(try!(chr.from_hex()).first().ok_or(Error::ParseError(None)))
+            *try!(try!(chr.from_hex()).first().ok_or(Error::Parse(None)))
         ).or_insert(try!(score.parse()));
     }
 
