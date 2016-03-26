@@ -48,7 +48,6 @@ fn it_works() {
         .map(|r| r.from_base64().unwrap())
         .collect::<Vec<Vec<u8>>>();
 
-    // FIXME May fail
     // let crypter = AesCTR::new(&rand!());
     let crypter = AesCTR::from(&[0; 16], &[0; 8]);
     let ciphertexts = inputs.iter()

@@ -33,7 +33,7 @@ impl MT19937 {
         }
     }
 
-    pub fn next(&mut self) -> u32 {
+    pub fn u32(&mut self) -> u32 {
         if self.index == 0 {
             self.gen();
         }
@@ -50,11 +50,19 @@ impl MT19937 {
     }
 }
 
+impl Iterator for MT19937 {
+    type Item = usize;
+    fn next(&mut self) -> Option<Self::Item> {
+        Some(self.u32() as usize)
+    }
+}
+
+
 #[test]
 fn it_works() {
     let mut mt_rng = MT19937::new(0);
 
-    let result = [
+    let result = vec![
         0x8C7F0AAC,
         0x97C4AA2F,
         0xB716A675,
@@ -68,6 +76,10 @@ fn it_works() {
     ];
 
     for &r in &result {
-        assert_eq!(r, mt_rng.next());
+        assert_eq!(Some(r), mt_rng.next());
     }
+
+    let mt_rng = MT19937::new(0);
+
+    assert_eq!(result, mt_rng.take(10).collect::<Vec<_>>());
 }
