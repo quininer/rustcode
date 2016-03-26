@@ -24,7 +24,14 @@ impl AesCTR {
         self.counter = counter;
         self
     }
-    pub fn update(&mut self, data: &[u8]) -> Vec<u8> {
+}
+
+pub trait StreamCipher {
+    fn update(&mut self, data: &[u8]) -> Vec<u8>;
+}
+
+impl StreamCipher for AesCTR {
+    fn update(&mut self, data: &[u8]) -> Vec<u8> {
         let crypter = Crypter::new(Type::AES_128_ECB);
         crypter.init(Mode::Encrypt, &self.key, &Vec::new());
         crypter.pad(false);

@@ -19,7 +19,7 @@ pub fn tailor_stram(data: &[Vec<u8>]) -> (usize, Vec<Vec<u8>>) {
 #[test]
 fn it_works() {
     use rustc_serialize::base64::FromBase64;
-    use implement_ctr_the_stream_cipher_mode::AesCTR;
+    use implement_ctr_the_stream_cipher_mode::{ AesCTR, StreamCipher };
     use break_repeating_key_xor::guess_key;
     use single_byte_xor_cipher::read_freqsmap;
 

@@ -38,7 +38,7 @@ fn it_works() {
     use std::fs::File;
     use std::io::Read;
     use rustc_serialize::base64::FromBase64;
-    use implement_ctr_the_stream_cipher_mode::AesCTR;
+    use implement_ctr_the_stream_cipher_mode::{ AesCTR, StreamCipher };
     use break_fixed_nonce_ctr_mode_using_substitions::tailor_stram;
 
     let mut inputs = String::new();

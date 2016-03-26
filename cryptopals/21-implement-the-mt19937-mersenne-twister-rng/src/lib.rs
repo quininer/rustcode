@@ -1,5 +1,7 @@
-use std::num::Wrapping;
+extern crate implement_ctr_the_stream_cipher_mode;
 
+use std::num::Wrapping;
+use implement_ctr_the_stream_cipher_mode::StreamCipher;
 
 pub struct MT19937 {
     mt: [u32; 624],
@@ -60,6 +62,14 @@ impl Iterator for MT19937 {
     type Item = usize;
     fn next(&mut self) -> Option<Self::Item> {
         Some(self.u32() as usize)
+    }
+}
+
+impl StreamCipher for MT19937 {
+    fn update(&mut self, data: &[u8]) -> Vec<u8> {
+        data.iter()
+            .map(|u| u ^ self.u32() as u8)
+            .collect()
     }
 }
 

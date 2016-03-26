@@ -1,0 +1,18 @@
+[package]
+name = "create-the-mt19937-stream-cipher-and-break-it"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-the-mt19937-mersenne-twister-rng]
+path = "../21-implement-the-mt19937-mersenne-twister-rng"
+
+[dependencies.implement-ctr-the-stream-cipher-mode]
+path = "../18-implement-ctr-the-stream-cipher-mode"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies]
