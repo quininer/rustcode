@@ -33,7 +33,7 @@ pub trait StreamCipher {
 impl StreamCipher for AesCTR {
     fn update(&mut self, data: &[u8]) -> Vec<u8> {
         let crypter = Crypter::new(Type::AES_128_ECB);
-        crypter.init(Mode::Encrypt, &self.key, &Vec::new());
+        crypter.init(Mode::Encrypt, &self.key, &[]);
         crypter.pad(false);
         data.chunks(self.key.len())
             .map(|u| {
