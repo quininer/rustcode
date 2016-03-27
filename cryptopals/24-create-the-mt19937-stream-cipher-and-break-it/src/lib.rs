@@ -5,11 +5,50 @@ extern crate implement_ctr_the_stream_cipher_mode;
 #[macro_use] extern crate fixed_xor;
 
 use implement_the_mt19937_mersenne_twister_rng::MT19937;
-use implement_ctr_the_stream_cipher_mode::StreamCipher;
+
+
+pub struct Token(u32);
+
+impl Token {
+    pub fn get(&self) -> Vec<u8> {
+        MT19937::new(self.0)
+            .take(16)
+            .map(|r| r as u8)
+            .collect()
+    }
+
+    pub fn verify(&self, data: &[u8]) -> bool {
+        self.get() == data
+    }
+}
 
 
 #[test]
-fn it_works() {
+fn test_token() {
+    use time::get_time;
+
+    let token = Token(get_time().sec as u32);
+
+    let now = get_time().sec as u32;
+    let seed = (now-1500..now+1500).find(|&u| token.verify(
+        &MT19937::new(u)
+            .take(16)
+            .map(|r| r as u8)
+            .collect::<Vec<_>>()
+    )).unwrap();
+
+    assert!(token.verify(
+        &MT19937::new(seed)
+            .take(16)
+            .map(|r| r as u8)
+            .collect::<Vec<_>>()
+    ));
+}
+
+#[test]
+fn test_crack_mt_mtream_cipher() {
+    use implement_ctr_the_stream_cipher_mode::StreamCipher;
+
     let key: u16 = rand!(x);
     let mut mt_cipher = MT19937::new(key as u32);
     let known_plaintext = b"AAAAAAAAAAAAAA";
@@ -26,7 +65,7 @@ fn it_works() {
             .map(|(k, p)| k as u8 ^ p)
             .collect::<Vec<_>>()
         ==
-        ciphertext[ciphertext.len() - known_plaintext.len()..].to_vec()
+        &ciphertext[ciphertext.len() - known_plaintext.len()..]
     ).map(|r| r as u16);
 
     assert_eq!(Some(key), guess_key);
@@ -34,6 +73,8 @@ fn it_works() {
 
 #[test]
 fn test_mt_stream_cipher() {
+    use implement_ctr_the_stream_cipher_mode::StreamCipher;
+
     let key: u16 = rand!(x);
     let data = rand!();
     assert_eq!(

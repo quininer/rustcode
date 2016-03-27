@@ -9,7 +9,7 @@ use implement_the_mt19937_mersenne_twister_rng::MT19937;
 pub fn crack_mt19937_seed(range: Range<u32>, out: &[usize]) -> Result<u32, ()> {
     range.clone().find(|&seed| MT19937::new(seed)
         .take(out.len())
-        .collect::<Vec<_>>() == out.to_vec()
+        .collect::<Vec<_>>() == out
     ).ok_or(())
 }
 
