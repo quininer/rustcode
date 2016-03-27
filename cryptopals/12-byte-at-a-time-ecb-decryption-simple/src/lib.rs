@@ -73,7 +73,7 @@ pub fn crack_ecb_nextbyte((offset, i): (usize, usize), bs: usize, known: &[u8], 
     if paddinged.len() <= pbs {
         return None;
     }
-    (0usize..256).find(
+    (0..std::u8::MAX as usize + 1).find(
         |u| &paddinged[offset..pbs] == &encryptor(&[
             padding.as_ref(),
             known,

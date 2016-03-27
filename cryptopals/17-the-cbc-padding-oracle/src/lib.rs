@@ -37,7 +37,7 @@ pub fn crack_cbc_block(iv: &[u8], data: &[u8], verify: &Verifyer) -> Result<Vec<
     let mut out = Vec::new();
 
     for i in 1..iv.len()+1 {
-        match (0usize..256)
+        match (0..std::u8::MAX as usize + 1)
             .find(|&u| verify(
                 &xor!(
                     iv.to_vec(),

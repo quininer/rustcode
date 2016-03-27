@@ -16,3 +16,4 @@ path = "../11-an-ebccbc-detection-oracle"
 path = "../2-fixed-xor"
 
 [dependencies]
+time = "*"

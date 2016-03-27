@@ -12,7 +12,7 @@ use break_repeating_key_xor::zip;
 pub fn guess_key(ciphertexts: Vec<Vec<u8>>, tablet: &[u8], more: &[u8]) -> Vec<u8> {
     zip(ciphertexts).iter()
         .map(|r| {
-            let out = (0..256)
+            let out = (0..std::u8::MAX as usize+1)
                 .map(|u| u as u8)
                 .filter(|&u| !xor_by(r, u).iter()
                     .any(|&n| !tablet.contains(&n))

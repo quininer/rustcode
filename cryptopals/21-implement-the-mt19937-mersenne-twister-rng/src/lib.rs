@@ -68,7 +68,7 @@ impl Iterator for MT19937 {
 impl StreamCipher for MT19937 {
     fn update(&mut self, data: &[u8]) -> Vec<u8> {
         data.iter()
-            .map(|u| u ^ self.u32() as u8)
+            .map(|u| self.u32() as u8 ^ u)
             .collect()
     }
 }

@@ -13,7 +13,7 @@ fn it_works() {
 
     let data = include_str!("input.txt");
     let data = data.from_base64().unwrap();
-    let prefix = rand!(rand!(choose 0..256));
+    let prefix = rand!(rand!(choose 0..std::u8::MAX as usize + 1));
     let oracle = Oracle::new(&prefix, &data);
 
     let empty_bs = oracle.encrypt(&[]).len();
