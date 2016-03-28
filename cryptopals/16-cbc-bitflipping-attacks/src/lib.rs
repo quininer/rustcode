@@ -17,6 +17,9 @@ impl Oracle {
     pub fn new(iv: &[u8]) -> Oracle  {
         Oracle { key: rand!(), iv: iv.into() }
     }
+    pub fn from(key: &[u8], iv: &[u8]) -> Oracle {
+        Oracle { key: key.into(), iv: iv.into()}
+    }
     pub fn decrypt_with(&self, iv: &[u8], data: &[u8]) -> Vec<u8> {
         AesCBC::new(&self.key, &iv).update(Mode::Decrypt, data)
     }

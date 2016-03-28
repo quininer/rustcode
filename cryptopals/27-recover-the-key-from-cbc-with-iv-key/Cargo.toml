@@ -1,0 +1,15 @@
+[package]
+name = "recover-the-key-from-cbc-with-iv-key"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies]
