@@ -17,20 +17,19 @@ impl Oracle {
     pub fn new(iv: &[u8]) -> Oracle  {
         Oracle { key: rand!(), iv: iv.into() }
     }
+    pub fn decrypt_with(&self, iv: &[u8], data: &[u8]) -> Vec<u8> {
+        AesCBC::new(&self.key, &iv).update(Mode::Decrypt, data)
+    }
 }
 
 pub trait Cipher {
     fn encrypt(&self, data: &[u8]) -> Vec<u8>;
-    fn decrypt_with(&self, iv: &[u8], data: &[u8]) -> Vec<u8>;
     fn decrypt(&self, data: &[u8]) -> Vec<u8>;
 }
 
 impl Cipher for Oracle {
     fn encrypt(&self, data: &[u8]) -> Vec<u8> {
         AesCBC::new(&self.key, &self.iv).update(Mode::Encrypt, data)
-    }
-    fn decrypt_with(&self, iv: &[u8], data: &[u8]) -> Vec<u8> {
-        AesCBC::new(&self.key, &iv).update(Mode::Decrypt, data)
     }
     fn decrypt(&self, data: &[u8]) -> Vec<u8> {
         self.decrypt_with(&self.iv, data)
@@ -52,7 +51,7 @@ pub fn postdata<D: AsRef<[u8]>>(input: D) -> String {
 /// let input = oracle.encrypt(b"xxxx;admin=true;");
 /// assert!(is_admin(&oracle, &input));
 /// ```
-pub fn is_admin(oracle: &Oracle, input: &[u8]) -> bool {
+pub fn is_admin<O: Cipher>(oracle: &O, input: &[u8]) -> bool {
     String::from_utf8_lossy(&oracle.decrypt(input))
         .contains(";admin=true;")
 }

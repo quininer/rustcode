@@ -1,9 +1,11 @@
 extern crate rustc_serialize;
 extern crate openssl;
+extern crate cbc_bitflipping_attacks;
 #[macro_use] extern crate fixed_xor;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use openssl::crypto::symm::{ Crypter, Type, Mode };
+use cbc_bitflipping_attacks::Cipher;
 
 
 #[derive(Clone)]
@@ -46,6 +48,15 @@ impl StreamCipher for AesCTR {
             })
             .collect::<Vec<_>>()
             .concat()
+    }
+}
+
+impl Cipher for AesCTR {
+    fn encrypt(&self, data: &[u8]) -> Vec<u8> {
+        self.clone().set_ctr(0).update(&data)
+    }
+    fn decrypt(&self, data: &[u8]) -> Vec<u8> {
+        self.clone().set_ctr(0).update(&data)
     }
 }
 

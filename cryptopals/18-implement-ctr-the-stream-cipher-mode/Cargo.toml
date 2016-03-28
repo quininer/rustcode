@@ -9,6 +9,9 @@ path = "../2-fixed-xor"
 [dependencies.an-ebccbc-detection-oracle]
 path = "../11-an-ebccbc-detection-oracle"
 
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
 [dependencies]
 openssl = "*"
 rustc-serialize = "*"

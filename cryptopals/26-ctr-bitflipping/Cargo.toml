@@ -1,13 +1,13 @@
 [package]
-name = "cbc-bitflipping-attacks"
+name = "ctr-bitflipping"
 version = "0.1.0"
 authors = ["quininer kel <quininer@live.com>"]
 
-[dependencies.implement-pkcs7-padding]
-path = "../9-implement-pkcs7-padding"
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
 
-[dependencies.implement-cbc-mode]
-path = "../10-implement-cbc-mode"
+[dependencies.implement-ctr-the-stream-cipher-mode]
+path = "../18-implement-ctr-the-stream-cipher-mode"
 
 [dependencies.an-ebccbc-detection-oracle]
 path = "../11-an-ebccbc-detection-oracle"
