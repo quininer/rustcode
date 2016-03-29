@@ -1,0 +1,8 @@
+[package]
+name = "implement-a-sha-1-keyed-mac"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies]
+byteorder = "*"
+rustc-serialize = "*"
