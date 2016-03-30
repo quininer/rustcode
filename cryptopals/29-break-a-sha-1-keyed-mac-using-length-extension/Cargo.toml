@@ -1,0 +1,15 @@
+[package]
+name = "break-a-sha-1-keyed-mac-using-length-extension"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-a-sha-1-keyed-mac]
+path = "../28-implement-a-sha-1-keyed-mac"
+
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]

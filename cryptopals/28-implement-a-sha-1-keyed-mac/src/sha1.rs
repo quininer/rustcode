@@ -1,5 +1,5 @@
 use std::hash::Hasher;
-use std::io::{ self, Cursor, Write, BufWriter, BufReader };
+use std::io::{ self, Write };
 use byteorder::{ BigEndian, WriteBytesExt, ReadBytesExt };
 
 
@@ -24,12 +24,22 @@ impl Sha1 {
         Sha1::default()
     }
 
-    fn process(&mut self, block: &[u8]) {
+    pub fn from(mut hash: &[u8]) -> io::Result<Sha1> {
+        Ok(Sha1(
+            hash.read_u32::<BigEndian>()?,
+            hash.read_u32::<BigEndian>()?,
+            hash.read_u32::<BigEndian>()?,
+            hash.read_u32::<BigEndian>()?,
+            hash.read_u32::<BigEndian>()?
+        ))
+    }
+
+    pub fn process(&mut self, block: &[u8]) {
         assert_eq!(block.len(), 64);
 
         let mut words = [0; 80];
         for (i, n) in block.chunks(4)
-            .map(|u| BufReader::new(u).read_u32::<BigEndian>().unwrap())
+            .map(|mut u| u.read_u32::<BigEndian>().unwrap())
             .enumerate()
         {
             words[i] = n;
@@ -51,7 +61,7 @@ impl Sha1 {
                 20...39 => (0x6ED9EBA1, b ^ c ^ d),
                 40...59 => (0x8F1BBCDC, (b & c) | (b & d) | (c & d)),
                 60...79 => (0xCA62C1D6, b ^ c ^ d),
-                _ => panic!("oop.")
+                _ => panic!("ooh.")
             };
             let temp = a
                 .rotate_left(5)
@@ -74,20 +84,20 @@ impl Sha1 {
     }
 
     fn input(&mut self, data: &[u8]) {
-        let data = padding(data).unwrap();
+        let data = padding(data, 0).unwrap();
         for u in data.chunks(64) {
             self.process(u);
         }
     }
 
     fn output(&mut self) -> io::Result<Vec<u8>> {
-        let mut out = BufWriter::new(Vec::new());
+        let mut out = Vec::new();
         out.write_u32::<BigEndian>(self.0)?;
         out.write_u32::<BigEndian>(self.1)?;
         out.write_u32::<BigEndian>(self.2)?;
         out.write_u32::<BigEndian>(self.3)?;
         out.write_u32::<BigEndian>(self.4)?;
-        Ok(out.into_inner()?)
+        Ok(out)
     }
 }
 
@@ -118,25 +128,29 @@ impl Hasher for Sha1 {
 /// ```
 /// use implement_a_sha_1_keyed_mac::padding;
 /// let data = b"implement-a-sha-1-keyed-mac";
-/// let out = padding(data).unwrap();
+/// let out = padding(data, 0).unwrap();
 /// assert_eq!(
 ///     out.len() % 64,
 ///     0
 /// );
+/// assert_eq!(
+///     &out[..out[out.len()-1] as usize / 8],
+///     data
+/// );
 /// ```
-pub fn padding(data: &[u8]) -> io::Result<Vec<u8>> {
-    let mut out = Cursor::new(Vec::new());
+pub fn padding(data: &[u8], offset: usize) -> io::Result<Vec<u8>> {
+    let mut out = Vec::new();
     out.write(data)?;
     out.write_u8(0x80)?;
 
-    if out.position() % (512 / 8) == (448 / 8) {
+    if out.len() % (512 / 8) == (448 / 8) {
         out.write_u8(0)?;
     }
 
-    while out.position() % (512 / 8) != (448 / 8) {
+    while out.len() % (512 / 8) != (448 / 8) {
         out.write_u8(0)?;
     }
 
-    out.write_u64::<BigEndian>(data.len() as u64 * 8)?;
-    Ok(out.into_inner())
+    out.write_u64::<BigEndian>((data.len() + offset) as u64 * 8)?;
+    Ok(out)
 }
