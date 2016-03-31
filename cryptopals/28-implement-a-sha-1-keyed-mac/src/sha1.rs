@@ -1,6 +1,6 @@
 use std::hash::Hasher;
 use std::io::{ self, Write };
-use byteorder::{ BigEndian, WriteBytesExt, ReadBytesExt };
+use byteorder::{ BigEndian, WriteBytesExt, ReadBytesExt, ByteOrder };
 
 
 const H0: u32 = 0x67452301;
@@ -84,7 +84,7 @@ impl Sha1 {
     }
 
     fn input(&mut self, data: &[u8]) {
-        let data = padding(data, 0).unwrap();
+        let data = padding::<BigEndian>(data, 0).unwrap();
         for u in data.chunks(64) {
             self.process(u);
         }
@@ -125,20 +125,7 @@ impl Hasher for Sha1 {
     }
 }
 
-/// ```
-/// use implement_a_sha_1_keyed_mac::padding;
-/// let data = b"implement-a-sha-1-keyed-mac";
-/// let out = padding(data, 0).unwrap();
-/// assert_eq!(
-///     out.len() % 64,
-///     0
-/// );
-/// assert_eq!(
-///     &out[..out[out.len()-1] as usize / 8],
-///     data
-/// );
-/// ```
-pub fn padding(data: &[u8], offset: usize) -> io::Result<Vec<u8>> {
+pub fn padding<E: ByteOrder>(data: &[u8], offset: usize) -> io::Result<Vec<u8>> {
     let mut out = Vec::new();
     out.write(data)?;
     out.write_u8(0x80)?;
@@ -151,6 +138,20 @@ pub fn padding(data: &[u8], offset: usize) -> io::Result<Vec<u8>> {
         out.write_u8(0)?;
     }
 
-    out.write_u64::<BigEndian>((data.len() + offset) as u64 * 8)?;
+    out.write_u64::<E>((data.len() + offset) as u64 * 8)?;
     Ok(out)
+}
+
+#[test]
+fn test_padding() {
+    let data = b"implement-a-sha-1-keyed-mac";
+    let out = padding::<BigEndian>(data, 0).unwrap();
+    assert_eq!(
+        out.len() % 64,
+        0
+    );
+    assert_eq!(
+        &out[..out[out.len()-1] as usize / 8],
+        data
+    );
 }

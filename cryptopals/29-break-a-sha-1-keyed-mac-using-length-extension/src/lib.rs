@@ -5,7 +5,11 @@ extern crate cbc_bitflipping_attacks;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use std::io;
-use implement_a_sha_1_keyed_mac::{ Sha1, Digest, sha1_mac, padding };
+use implement_a_sha_1_keyed_mac::{
+    Sha1, Digest,
+    sha1_mac, padding,
+    BigEndian
+};
 use cbc_bitflipping_attacks::postdata;
 
 
@@ -26,8 +30,8 @@ pub fn crack_sha1mac_append(
     append: &[u8]
 ) -> io::Result<(Vec<u8>, Vec<u8>)> {
     let mut sha1 = Sha1::from(hash)?;
-    let pad = &padding(&[&vec![0; ks], message].concat(), 0)?[ks+message.len()..];
-    sha1.process(&padding(append, ks+message.len()+pad.len())?);
+    let pad = &padding::<BigEndian>(&[&vec![0; ks], message].concat(), 0)?[ks+message.len()..];
+    sha1.process(&padding::<BigEndian>(append, ks+message.len()+pad.len())?);
 
     Ok((
         sha1.digest(),

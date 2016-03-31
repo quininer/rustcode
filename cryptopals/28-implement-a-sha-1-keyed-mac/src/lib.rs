@@ -5,6 +5,7 @@ extern crate byteorder;
 
 mod sha1;
 
+pub use byteorder::{ BigEndian, LittleEndian };
 pub use sha1::{ Sha1, Digest, padding };
 
 
