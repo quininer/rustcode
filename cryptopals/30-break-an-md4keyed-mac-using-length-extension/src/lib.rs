@@ -13,7 +13,7 @@ pub use md4::MD4;
 
 
 pub fn md4_mac(key: &[u8], message: &[u8]) -> Vec<u8> {
-    concat_mac(&mut MD4::new(), key, message)
+    concat_mac::<MD4>(key, message)
 }
 
 pub fn crack_md4mac_append(

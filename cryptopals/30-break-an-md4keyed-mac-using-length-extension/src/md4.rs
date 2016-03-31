@@ -92,12 +92,14 @@ impl Hasher for MD4 {
 }
 
 impl Digest for MD4 {
+    fn bs() -> usize { 64 }
     fn digest(&mut self) -> Vec<u8> {
         self.output().unwrap()
     }
-    fn hash(&mut self, bytes: &[u8]) -> Vec<u8> {
-        self.write(bytes);
-        self.digest()
+    fn hash(bytes: &[u8]) -> Vec<u8> {
+        let mut hasher = MD4::new();
+        hasher.write(bytes);
+        hasher.digest()
     }
 }
 
@@ -129,16 +131,16 @@ fn round_3(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
 fn test_md4() {
     use rustc_serialize::hex::FromHex;
 
-    // assert_eq!(
-    //     MD4::new().hash(b""),
-    //     "31d6cfe0d16ae931b73c59d7e0c089c0".from_hex().unwrap()
-    // );
     assert_eq!(
-        MD4::new().hash(b"The quick brown fox jumps over the lazy dog"),
+        MD4::hash(b""),
+        "31d6cfe0d16ae931b73c59d7e0c089c0".from_hex().unwrap()
+    );
+    assert_eq!(
+        MD4::hash(b"The quick brown fox jumps over the lazy dog"),
         "1bee69a46ba811185c194762abaeae90".from_hex().unwrap()
     );
     assert_eq!(
-        MD4::new().hash(b"The quick brown fox jumps over the lazy cog"),
+        MD4::hash(b"The quick brown fox jumps over the lazy cog"),
         "b86e130ce7028da59e672d56ad0113df".from_hex().unwrap()
     );
 }

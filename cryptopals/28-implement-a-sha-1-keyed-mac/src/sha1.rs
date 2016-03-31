@@ -102,17 +102,20 @@ impl Sha1 {
 }
 
 pub trait Digest: Hasher {
+    fn bs() -> usize;
     fn digest(&mut self) -> Vec<u8>;
-    fn hash(&mut self, bytes: &[u8]) -> Vec<u8>;
+    fn hash(bytes: &[u8]) -> Vec<u8>;
 }
 
 impl Digest for Sha1 {
+    fn bs() -> usize { 64 }
     fn digest(&mut self) -> Vec<u8> {
         self.output().unwrap()
     }
-    fn hash(&mut self, bytes: &[u8]) -> Vec<u8> {
-        self.write(bytes);
-        self.digest()
+    fn hash(bytes: &[u8]) -> Vec<u8> {
+        let mut hasher = Sha1::new();
+        hasher.write(bytes);
+        hasher.digest()
     }
 }
 
