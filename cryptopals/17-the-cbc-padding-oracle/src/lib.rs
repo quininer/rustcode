@@ -9,7 +9,7 @@ extern crate implement_pkcs7_padding;
 use pkcs7_padding_validation::unpksc7padding;
 use cbc_bitflipping_attacks::{ Oracle, Cipher };
 
-
+#[macro_export]
 macro_rules! leftpad {
     ( $data:expr, $len:expr, $default:expr ) => {
         [

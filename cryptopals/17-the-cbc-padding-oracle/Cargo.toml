@@ -1,5 +1,5 @@
 [package]
-name = "17-the-cbc-padding-oracle"
+name = "the-cbc-padding-oracle"
 version = "0.1.0"
 authors = ["quininer kel <quininer@live.com>"]
 

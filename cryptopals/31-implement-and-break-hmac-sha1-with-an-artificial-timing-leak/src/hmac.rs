@@ -6,7 +6,7 @@ pub fn hmac<H: Digest>(key: &[u8], message: &[u8]) -> Vec<u8> {
     let key = if key.len() > bs {
         H::hash(key)
     } else if key.len() < bs {
-        [key, &vec![0; bs-key.len()]].concat()
+        [key.into(), vec![0; bs-key.len()]].concat()
     } else { key.into() };
 
     H::hash(&[
