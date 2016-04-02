@@ -10,7 +10,8 @@ use num::traits::{ Zero, One };
 use num::pow;
 
 lazy_static! {
-    pub static ref P: BigUint = "ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024
+    pub static ref P: BigUint ="
+ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024
 e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd
 3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec
 6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f
@@ -28,7 +29,7 @@ fffffffffffff"
 pub struct DH {
     p: BigUint,
     s: BigUint,
-    pub k: BigUint
+    k: BigUint
 }
 
 impl Default for DH {
@@ -43,20 +44,25 @@ impl DH {
         DH {
             p: p.clone(),
             s: s.clone(),
-            k: modexp(
-                g.clone(),
-                s.clone(),
-                p.clone()
-            )
+            k: modexp(g.clone(), s.clone(), p.clone())
         }
     }
 }
 
 pub trait NumExchange {
+    fn from_num(p: &BigUint, g: &BigUint, token: &BigUint) -> (BigUint, BigUint);
+    fn num_public(&self) -> BigUint;
     fn num_exchange(&self, token: &BigUint) -> BigUint;
 }
 
 impl NumExchange for DH {
+    fn from_num(p: &BigUint, g: &BigUint, token: &BigUint) -> (BigUint, BigUint) {
+        let dh = DH::new(p.clone(), g.clone());
+        (dh.num_public(), dh.num_exchange(token))
+    }
+    fn num_public(&self) -> BigUint {
+        self.k.clone()
+    }
     fn num_exchange(&self, token: &BigUint) -> BigUint {
         modexp(token.clone(), self.s.clone(), self.p.clone())
     }
@@ -85,7 +91,7 @@ fn test_dh() {
     let bob = DH::default();
 
     assert_eq!(
-        alice.num_exchange(&bob.k),
-        bob.num_exchange(&alice.k)
+        alice.num_exchange(&bob.num_public()),
+        bob.num_exchange(&alice.num_public())
     );
 }
