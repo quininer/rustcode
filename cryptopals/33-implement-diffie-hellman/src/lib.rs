@@ -26,6 +26,7 @@ fffffffffffff"
 }
 
 
+#[derive(Clone)]
 pub struct DH {
     p: BigUint,
     s: BigUint,
@@ -46,6 +47,12 @@ impl DH {
             s: s.clone(),
             k: modexp(g.clone(), s.clone(), p.clone())
         }
+    }
+    pub fn new_data(p: &[u8], g: &[u8]) -> DH {
+        DH::new(
+            BigUint::from_bytes_be(p),
+            BigUint::from_bytes_be(g)
+        )
     }
 }
 

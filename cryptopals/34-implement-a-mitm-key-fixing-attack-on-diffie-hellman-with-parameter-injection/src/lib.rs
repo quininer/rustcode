@@ -4,109 +4,157 @@ extern crate implement_cbc_mode;
 extern crate implement_a_sha_1_keyed_mac;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
-use num::BigUint;
-use implement_cbc_mode::AesCBC;
-use implement_a_sha_1_keyed_mac::{ Sha1, Digest };
-use implement_diffie_hellman::{ DH, NumExchange };
+mod message;
+mod exchange;
 
+pub use message::Message;
+pub use exchange::{ Exchange, GenCrypter };
 
-pub trait Exchange: NumExchange {
-    fn from_data(p: &[u8], g: &[u8], token: &[u8]) -> (Vec<u8>, Vec<u8>) {
-        let (public, secret) = Self::from_num(
-            &BigUint::from_bytes_be(p),
-            &BigUint::from_bytes_be(g),
-            &BigUint::from_bytes_be(token)
-        );
-        (public.to_bytes_be(), secret.to_bytes_be())
-    }
-    fn public(&self) -> Vec<u8> {
-        self.num_public().to_bytes_be()
-    }
-    fn exchange(&self, token: &[u8]) -> Vec<u8> {
-        self.num_exchange(&BigUint::from_bytes_be(token))
-            .to_bytes_be()
-    }
-}
-
-impl Exchange for DH {}
-
-pub trait GenCrypter: Exchange {
-    fn handshake_read(&self, token: &[u8]) -> AesCBC {
-        AesCBC::new(
-            &Sha1::hash(&self.exchange(token))[..16],
-            &[0; 16]
-        )
-    }
-    fn handshake(p: &[u8], g: &[u8], token: &[u8]) -> (AesCBC, Vec<u8>) {
-        let (pk, sk) = Self::from_data(p, g, token);
-        (
-            AesCBC::new(&Sha1::hash(&sk)[..16], &[0; 16]),
-            pk
-        )
-    }
-}
-
-impl GenCrypter for DH {}
 
 #[test]
-fn test_dh_aescbc() {
+fn test_message() {
+    use std::thread;
+    use std::sync::mpsc::channel;
     use implement_cbc_mode::Mode;
-    use implement_diffie_hellman::{ P, G };
+    use implement_diffie_hellman::{ DH, P, G };
 
     let plaintext = b"YELLOW SUBMARINE";
+    let (alice_channel, alice) = channel::<Message>();
+    let (bob_channel, bob) = channel::<Message>();
+    let alice_channel_start = alice_channel.clone();
 
-    let alice = DH::default();
-    let handshake_args = (
-        P.to_bytes_be(),
-        G.to_bytes_be(),
-        alice.public()
-    );
-    let (mut bob_aes, token) = DH::handshake(
-        &handshake_args.0,
-        &handshake_args.1,
-        &handshake_args.2
-    );
+    let alice_thread = thread::spawn(move || {
+        let mut alice_dh = None;
+        loop {
+            match alice.recv() {
+                Ok(Message::Start) => {
+                    alice_dh = Some(DH::default());
+                    bob_channel.send(Message::HandshakeAll(
+                        P.to_bytes_be(),
+                        G.to_bytes_be(),
+                        alice_dh.clone().unwrap().public()
+                    )).ok();
+                },
+                Ok(Message::MessageAll(pk, iv, ciphertext)) => {
+                    if let Some(dh) = alice_dh.clone() {
+                        let mut alice_aes = dh.handshake_read(&pk, &iv);
+                        assert_eq!(
+                            alice_aes.update(Mode::Decrypt, &ciphertext),
+                            plaintext
+                        );
+                        break
+                    }
+                }
+                _ => panic!()
+            }
+        };
+        true
+    });
 
-    let ciphertext = bob_aes.update(Mode::Encrypt, plaintext);
-    assert_eq!(
-        alice.handshake_read(&token).update(Mode::Decrypt, &ciphertext),
-        plaintext.to_vec()
-    );
+    thread::spawn(move || loop {
+        match bob.recv() {
+            Ok(Message::HandshakeAll(p, g, pk)) => {
+                let (mut bob_aes, pk, iv) = DH::handshake(
+                    &p,
+                    &g,
+                    &pk
+                );
+                alice_channel.send(Message::MessageAll(
+                    pk,
+                    iv,
+                    bob_aes.update(Mode::Encrypt, plaintext)
+                )).ok();
+            },
+            _ => break
+        }
+    });
+
+    alice_channel_start.send(Message::Start).ok();
+    assert!(alice_thread.join().unwrap_or(false));
 }
 
+
 #[test]
-fn it_works() {
+fn test_mitm() {
+    use std::thread;
+    use std::sync::mpsc::channel;
     use implement_cbc_mode::Mode;
-    use implement_diffie_hellman::{ P, G };
+    use implement_diffie_hellman::{ DH, P, G };
 
     let plaintext = b"YELLOW SUBMARINE";
+    let (alice_channel, alice) = channel::<Message>();
+    let (bob_channel, bob) = channel::<Message>();
+    let (mallory_channel, mallory) = channel::<Message>();
+    let alice_channel_start = alice_channel.clone();
 
-    let alice = DH::default();
-    let handshake_args = (
-        P.to_bytes_be(),
-        G.to_bytes_be(),
-        alice.public()
-    );
+    let alice_mallory_channel = mallory_channel.clone();
+    let alice_thread = thread::spawn(move || {
+        let mut alice_dh = None;
+        loop {
+            match alice.recv() {
+                Ok(Message::Start) => {
+                    alice_dh = Some(DH::default());
+                    alice_mallory_channel.send(Message::HandshakeAll(
+                        P.to_bytes_be(),
+                        G.to_bytes_be(),
+                        alice_dh.clone().unwrap().public()
+                    )).ok();
+                },
+                Ok(Message::MessageAll(pk, iv, ciphertext)) => {
+                    if let Some(dh) = alice_dh.clone() {
+                        let mut alice_aes = dh.handshake_read(&pk, &iv);
+                        assert_eq!(
+                            alice_aes.update(Mode::Decrypt, &ciphertext),
+                            plaintext
+                        );
+                        break
+                    }
+                }
+                _ => panic!()
+            }
+        };
+        true
+    });
 
-    // mitm
-    let bad_handshake_args = (
-        handshake_args.0.clone(),
-        handshake_args.1,
-        handshake_args.0.clone()
-    );
+    let bob_mallory_channel = mallory_channel.clone();
+    thread::spawn(move || loop {
+        match bob.recv() {
+            Ok(Message::HandshakeAll(p, g, pk)) => {
+                let (mut bob_aes, pk, iv) = DH::handshake(
+                    &p,
+                    &g,
+                    &pk
+                );
+                bob_mallory_channel.send(Message::MessageAll(
+                    pk,
+                    iv,
+                    bob_aes.update(Mode::Encrypt, plaintext)
+                )).ok();
+            },
+            _ => break
+        }
+    });
 
-    let (mut bob_aes, token) = DH::handshake(
-        &bad_handshake_args.0,
-        &bad_handshake_args.1,
-        &bad_handshake_args.2
-    );
+    thread::spawn(move || {
+        let mut mp = None;
+        loop {
+            match mallory.recv() {
+                Ok(Message::HandshakeAll(p, g, _)) => {
+                    mp = Some(p.clone());
+                    bob_channel.send(Message::HandshakeAll(
+                        p.clone(), g, p
+                    )).ok();
+                },
+                Ok(Message::MessageAll(_, iv, ciphertext)) => {
+                    alice_channel.send(Message::MessageAll(
+                        mp.clone().unwrap(), iv, ciphertext
+                    )).ok();
+                }
+                _ => break
+            }
+        }
+    });
 
-    // mitm
-    let bad_token = bad_handshake_args.2;
-
-    let ciphertext = bob_aes.update(Mode::Encrypt, plaintext);
-    assert_eq!(
-        alice.handshake_read(&bad_token).update(Mode::Decrypt, &ciphertext),
-        plaintext.to_vec()
-    );
+    alice_channel_start.send(Message::Start).ok();
+    assert!(alice_thread.join().unwrap_or(false));
 }
