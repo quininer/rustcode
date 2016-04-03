@@ -23,6 +23,9 @@ fffffffffffff"
         .map(|n| BigUint::from_bytes_be(&n))
         .unwrap();
     pub static ref G: BigUint = BigUint::from(2u32);
+
+    pub static ref ONE: BigUint = BigUint::one();
+    pub static ref ZERO: BigUint = BigUint::zero();
 }
 
 

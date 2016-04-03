@@ -1,0 +1,21 @@
+[package]
+name = "implement-dh-with-negotiated-groups-and-break-with-malicious-g-parameters"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-diffie-hellman]
+path = "../33-implement-diffie-hellman"
+
+[dependencies.implement-a-mitm-key-fixing-attack-on-diffie-hellman-with-parameter-injection]
+path = "../34-implement-a-mitm-key-fixing-attack-on-diffie-hellman-with-parameter-injection"
+
+[dependencies.implement-a-sha-1-keyed-mac]
+path = "../28-implement-a-sha-1-keyed-mac"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies.implement-cbc-mode]
+path = "../10-implement-cbc-mode"
+
+[dependencies]
