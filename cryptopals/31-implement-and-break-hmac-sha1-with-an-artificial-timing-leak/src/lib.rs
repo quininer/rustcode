@@ -40,24 +40,28 @@ pub fn crack_hmac_app(
     check: Box<Fn(&[u8]) -> bool>
 ) -> Vec<u8> {
     let mut out = Vec::new();
-    for _ in 0..len {
-        let byte = (0..std::u8::MAX as usize+1).map(|u| (
+    for _ in 0..len-1 {
+        let byte = (0..std::u8::MAX as usize+1).map(|u| u as u8).map(|u| (
             (0..num).map(|_| {
                 let start = PreciseTime::now();
                 check(&rightpad(&[
                     out.clone(),
-                    vec![u as u8]
+                    vec![u]
                 ].concat(), 20));
                 let end = PreciseTime::now();
                 start.to(end)
             }).fold(Duration::zero(), |out, next| out + next),
-            u as u8
+            u
         ))
             .max()
             .unwrap()
             .1;
         out.push(byte);
     }
+    let byte = (0..std::u8::MAX as usize+1).map(|u| u as u8).find(|&u| check(
+        &[out.clone(), vec![u]].concat()
+    )).unwrap();
+    out.push(byte);
     out
 }
 

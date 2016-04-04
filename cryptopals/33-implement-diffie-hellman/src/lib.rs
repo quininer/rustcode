@@ -44,7 +44,7 @@ impl Default for DH {
 
 impl DH {
     pub fn new(p: BigUint, g: BigUint) -> DH {
-        let s = thread_rng().gen_biguint_range(&BigUint::zero(), &p);
+        let s = thread_rng().gen_biguint_range(&ZERO, &p);
         DH {
             p: p.clone(),
             s: s.clone(),
@@ -79,10 +79,10 @@ impl NumExchange for DH {
 }
 
 pub fn modexp(mut base: BigUint, mut exps: BigUint, mods: BigUint) -> BigUint {
-    let mut out = BigUint::one();
+    let mut out = ONE.clone();
 
-    while exps > BigUint::zero() {
-        if exps.clone() & BigUint::one() == BigUint::one() {
+    while exps > ZERO.clone() {
+        if exps.clone() & ONE.clone() == ONE.clone() {
             out = out * base.clone() % mods.clone();
         }
 

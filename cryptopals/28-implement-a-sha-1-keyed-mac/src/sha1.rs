@@ -61,7 +61,7 @@ impl Sha1 {
                 20...39 => (0x6ED9EBA1, b ^ c ^ d),
                 40...59 => (0x8F1BBCDC, (b & c) | (b & d) | (c & d)),
                 60...79 => (0xCA62C1D6, b ^ c ^ d),
-                _ => panic!("ooh.")
+                _ => unreachable!()
             };
             let temp = a
                 .rotate_left(5)

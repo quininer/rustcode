@@ -23,7 +23,10 @@ fn it_work() {
     ] {
         let iv = rand!();
         let alice = DH::default();
+
+        // mitmp
         let bob = DH::new_data(&p, &g);
+
         let mut alice_aes = alice.handshake_read(&bob.public(), &iv);
         let mut bob_aes = bob.handshake_read(&alice.public(), &iv);
 
@@ -36,6 +39,7 @@ fn it_work() {
             plaintext
         );
 
+        // mitm decryption
         assert!(guess.iter().any(|k| {
             AesCBC::new(&Sha1::hash(&k)[..16], &iv)
                 .update(Mode::Decrypt, &ciphertext)

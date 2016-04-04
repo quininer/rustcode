@@ -45,7 +45,7 @@ fn test_message() {
                         break
                     }
                 }
-                _ => panic!()
+                _ => unreachable!()
             }
         };
         true
@@ -110,7 +110,7 @@ fn test_mitm() {
                         break
                     }
                 }
-                _ => panic!()
+                _ => unreachable!()
             }
         };
         true
