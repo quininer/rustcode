@@ -2,7 +2,7 @@ use implement_a_sha_1_keyed_mac::{ Sha1, Digest };
 
 
 pub fn hmac<H: Digest>(key: &[u8], message: &[u8]) -> Vec<u8> {
-    let bs = 64;
+    let bs = H::bs();
     let key = if key.len() > bs {
         H::hash(key)
     } else if key.len() < bs {

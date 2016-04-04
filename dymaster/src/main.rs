@@ -4,6 +4,7 @@ use std::path::Path;
 use std::env::{ args };
 use libloading::{ Library, Symbol };
 
+
 fn main() {
     let slave = Library::new(
         Path::new(&args().nth(1).unwrap_or(String::from("./libslave.so")))

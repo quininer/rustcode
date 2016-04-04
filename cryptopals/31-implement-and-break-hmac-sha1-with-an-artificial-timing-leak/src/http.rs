@@ -4,6 +4,7 @@ use rustc_serialize::hex::{ ToHex, FromHex };
 use rouille::{ Request, Response, RouteError };
 use super::hmac_sha1;
 
+
 lazy_static!{
     static ref KEY: Vec<u8> = rand!(rand!(choose 5..40));
 }
@@ -24,16 +25,16 @@ pub fn insecure_compare(hash: &[u8], signature: &[u8]) -> bool {
 pub fn hmac_app(req: &Request) -> Response {
     router!( req,
         (GET) (/test/get) => {
-            let file = b"foo";
+            let file = String::from("foo");
             Ok(Response::json(&hashmap!{
-                "file" => String::from_utf8(file.to_vec()).unwrap(),
-                "signature" => hmac_sha1(&KEY, file).to_hex()
+                "file" => file.clone(),
+                "signature" => hmac_sha1(&KEY, file.as_bytes()).to_hex()
             }))
         },
         (GET) (/test/{file: String}/{signature: String}) => {
             Ok(if insecure_compare(
                 &hmac_sha1(&KEY, file.as_bytes()),
-                &signature.from_hex().unwrap()
+                &signature.from_hex().unwrap_or(Vec::new())
             ) {
                 Response::text("true").with_status_code(200)
             } else {
@@ -46,7 +47,7 @@ pub fn hmac_app(req: &Request) -> Response {
 
 #[macro_export]
 macro_rules! request {
-    (request $url:expr ) => {
+    ( request $url:expr ) => {
         $crate::hyper::Client::new()
             .get($url)
             .header($crate::hyper::header::Connection::close())
@@ -57,7 +58,7 @@ macro_rules! request {
         let mut out = String::new();
         request!(request $url)
             .read_to_string(&mut out).unwrap();
-        decode(&out).unwrap()
+        $crate::rustc_serialize::json::decode(&out).unwrap()
     }};
     ( $url:expr ) => {
         (request!(request $url)).status.is_success()
@@ -68,22 +69,21 @@ macro_rules! request {
 #[test]
 fn test_hmac_app() {
     use std::collections::HashMap;
-    use rustc_serialize::json::decode;
     use rouille::start_server;
 
-    thread::spawn(|| start_server("127.0.0.1:8000", hmac_app));
+    thread::spawn(|| start_server("127.0.0.1:8001", hmac_app));
 
-    let result: HashMap<String, String> = request!(json "http://127.0.0.1:8000/test/get");
+    let result: HashMap<String, String> = request!(json "http://127.0.0.1:8001/test/get");
     assert_eq!(result.get("file").unwrap(), "foo");
 
     assert!(request!(&format!(
-        "http://127.0.0.1:8000/test/{}/{}",
+        "http://127.0.0.1:8001/test/{}/{}",
         result.get("file").unwrap(),
         result.get("signature").unwrap()
     )));
 
     assert!(!request!(&format!(
-        "http://127.0.0.1:8000/test/{}/{}",
+        "http://127.0.0.1:8001/test/{}/{}",
         "wow",
         result.get("signature").unwrap()
     )));

@@ -28,7 +28,6 @@ impl MD4 {
 
     pub fn process(&mut self, mut block: &[u8]) {
         assert_eq!(block.len(), 64);
-        println!("{:?}", block);
 
         let mut data = Vec::new();
         loop {

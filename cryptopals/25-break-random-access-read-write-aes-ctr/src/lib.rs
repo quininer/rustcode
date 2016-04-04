@@ -6,6 +6,8 @@ extern crate implement_ctr_the_stream_cipher_mode;
 use implement_ctr_the_stream_cipher_mode::{ AesCTR, StreamCipher };
 
 
+pub type Editor = Box<Fn(&[u8], usize, &[u8]) -> Vec<u8>>;
+
 pub trait Edit: StreamCipher {
     fn edit(
         &self,
@@ -33,7 +35,7 @@ impl Edit for AesCTR {
 
 pub fn crack_ctr_edit(
     ciphertext: &[u8],
-    editor: Box<Fn(&[u8], usize, &[u8]) -> Vec<u8>>
+    editor: Editor
 ) -> Vec<u8> {
     let mut out = vec![0; ciphertext.len()];
     for i in 0..ciphertext.len() {

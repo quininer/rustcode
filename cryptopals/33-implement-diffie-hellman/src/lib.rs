@@ -60,21 +60,21 @@ impl DH {
 }
 
 pub trait NumExchange {
-    fn from_num(p: &BigUint, g: &BigUint, token: &BigUint) -> (BigUint, BigUint);
+    fn from_num(p: &BigUint, g: &BigUint, pk: &BigUint) -> (BigUint, BigUint);
     fn num_public(&self) -> BigUint;
-    fn num_exchange(&self, token: &BigUint) -> BigUint;
+    fn num_exchange(&self, pk: &BigUint) -> BigUint;
 }
 
 impl NumExchange for DH {
-    fn from_num(p: &BigUint, g: &BigUint, token: &BigUint) -> (BigUint, BigUint) {
+    fn from_num(p: &BigUint, g: &BigUint, pk: &BigUint) -> (BigUint, BigUint) {
         let dh = DH::new(p.clone(), g.clone());
-        (dh.num_public(), dh.num_exchange(token))
+        (dh.num_public(), dh.num_exchange(pk))
     }
     fn num_public(&self) -> BigUint {
         self.k.clone()
     }
-    fn num_exchange(&self, token: &BigUint) -> BigUint {
-        modexp(token.clone(), self.s.clone(), self.p.clone())
+    fn num_exchange(&self, pk: &BigUint) -> BigUint {
+        modexp(pk.clone(), self.s.clone(), self.p.clone())
     }
 }
 

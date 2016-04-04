@@ -7,7 +7,7 @@ extern crate implement_pkcs7_padding;
 #[macro_use] extern crate fixed_xor;
 
 use pkcs7_padding_validation::unpksc7padding;
-use cbc_bitflipping_attacks::{ Oracle, Cipher };
+use cbc_bitflipping_attacks::Oracle;
 
 #[macro_export]
 macro_rules! leftpad {
@@ -82,6 +82,7 @@ pub fn crack_cbc_padding(iv: &[u8], data: &[u8], verify: Verifyer) -> Vec<u8> {
 #[test]
 fn it_works() {
     use implement_pkcs7_padding::pkcs7padding;
+    use cbc_bitflipping_attacks::Cipher;
 
     let input = include_str!("input.txt");
     let input: Vec<_> = rand!(choose input.lines()).into();

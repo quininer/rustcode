@@ -5,19 +5,19 @@ use implement_diffie_hellman::{ DH, NumExchange };
 
 
 pub trait Exchange: NumExchange {
-    fn from_data(p: &[u8], g: &[u8], token: &[u8]) -> (Vec<u8>, Vec<u8>) {
+    fn from_data(p: &[u8], g: &[u8], pk: &[u8]) -> (Vec<u8>, Vec<u8>) {
         let (public, secret) = Self::from_num(
             &BigUint::from_bytes_be(p),
             &BigUint::from_bytes_be(g),
-            &BigUint::from_bytes_be(token)
+            &BigUint::from_bytes_be(pk)
         );
         (public.to_bytes_be(), secret.to_bytes_be())
     }
     fn public(&self) -> Vec<u8> {
         self.num_public().to_bytes_be()
     }
-    fn exchange(&self, token: &[u8]) -> Vec<u8> {
-        self.num_exchange(&BigUint::from_bytes_be(token))
+    fn exchange(&self, pk: &[u8]) -> Vec<u8> {
+        self.num_exchange(&BigUint::from_bytes_be(pk))
             .to_bytes_be()
     }
 }
@@ -25,14 +25,14 @@ pub trait Exchange: NumExchange {
 impl Exchange for DH {}
 
 pub trait GenCrypter: Exchange {
-    fn handshake_read(&self, token: &[u8], iv: &[u8]) -> AesCBC {
+    fn handshake_read(&self, pk: &[u8], iv: &[u8]) -> AesCBC {
         AesCBC::new(
-            &Sha1::hash(&self.exchange(token))[..16],
+            &Sha1::hash(&self.exchange(pk))[..16],
             iv
         )
     }
-    fn handshake(p: &[u8], g: &[u8], token: &[u8]) -> (AesCBC, Vec<u8>, Vec<u8>) {
-        let (pk, sk) = Self::from_data(p, g, token);
+    fn handshake(p: &[u8], g: &[u8], pk: &[u8]) -> (AesCBC, Vec<u8>, Vec<u8>) {
+        let (pk, sk) = Self::from_data(p, g, pk);
         let iv = rand!();
         (
             AesCBC::new(&Sha1::hash(&sk)[..16], &iv),
