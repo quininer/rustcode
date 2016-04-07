@@ -80,6 +80,8 @@ impl Server {
                     )).ok();
                 },
                 Ok(Message::HMAC(value)) => {
+                    // NOTE (A * v**u) ** b % N
+                    // if A = 0 ?
                     let s = modexp(
                         alice_pk_save.clone().unwrap()
                             * modexp(self.v.clone(), u.clone().unwrap(), N.clone()),

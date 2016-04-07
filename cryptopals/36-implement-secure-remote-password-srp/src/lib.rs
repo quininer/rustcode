@@ -11,7 +11,7 @@ extern crate implement_a_mitm_key_fixing_attack_on_diffie_hellman_with_parameter
 mod sha256;
 mod message;
 
-pub use message::{ Message, Server, Client };
+pub use message::{ Message, Server, Client, N, K };
 pub use sha256::{ Sha256, hmac_sha256 };
 
 
