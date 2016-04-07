@@ -25,6 +25,8 @@ pub enum Message {
     Login(Vec<u8>, Vec<u8>),
     /// salt, DH pk
     Exchange(Vec<u8>, Vec<u8>),
+    /// salt, DH pk, u
+    UExchange(Vec<u8>, Vec<u8>, Vec<u8>),
     /// HMAC value
     HMAC(Vec<u8>),
     /// validate ok
@@ -82,6 +84,7 @@ impl Server {
                 Ok(Message::HMAC(value)) => {
                     // NOTE (A * v**u) ** b % N
                     // if A = 0 ?
+                    // if A = N**_ ?
                     let s = modexp(
                         alice_pk_save.clone().unwrap()
                             * modexp(self.v.clone(), u.clone().unwrap(), N.clone()),

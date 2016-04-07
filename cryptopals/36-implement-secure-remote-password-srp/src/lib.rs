@@ -9,9 +9,9 @@ extern crate implement_a_mitm_key_fixing_attack_on_diffie_hellman_with_parameter
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 mod sha256;
-mod message;
+mod srp;
 
-pub use message::{ Message, Server, Client, N, K };
+pub use srp::{ Message, Server, Client, N, K };
 pub use sha256::{ Sha256, hmac_sha256 };
 
 

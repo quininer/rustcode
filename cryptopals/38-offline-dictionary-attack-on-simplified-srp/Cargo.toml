@@ -1,0 +1,19 @@
+[package]
+name = "offline-dictionary-attack-on-simplified-srp"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-secure-remote-password-srp]
+path = "../36-implement-secure-remote-password-srp"
+
+[dependencies.implement-diffie-hellman]
+path = "../33-implement-diffie-hellman"
+
+[dependencies.implement-a-sha-1-keyed-mac]
+path = "../28-implement-a-sha-1-keyed-mac"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]
+num = "*"
