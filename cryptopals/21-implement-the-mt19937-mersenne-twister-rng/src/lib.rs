@@ -3,6 +3,7 @@ extern crate implement_ctr_the_stream_cipher_mode;
 use std::num::Wrapping;
 use implement_ctr_the_stream_cipher_mode::StreamCipher;
 
+
 pub struct MT19937 {
     mt: [u32; 624],
     index: usize

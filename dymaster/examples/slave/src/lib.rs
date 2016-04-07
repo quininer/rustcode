@@ -1,5 +1,5 @@
 #[no_mangle]
-pub unsafe fn foo(bar: isize) -> isize {
+pub unsafe fn foo(bar: usize) -> usize {
     bar.pow(bar as u32)
 }
 

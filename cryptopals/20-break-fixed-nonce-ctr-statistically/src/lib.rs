@@ -48,8 +48,9 @@ fn it_works() {
         .map(|r| r.from_base64().unwrap())
         .collect::<Vec<Vec<u8>>>();
 
-    // let crypter = AesCTR::new(&rand!());
-    let crypter = AesCTR::from(&[0; 16], &[0; 8]);
+    // FIXME
+    // let crypter = AesCTR::from(&[0; 16], &[0; 8]);
+    let crypter = AesCTR::new(&rand!());
     let ciphertexts = inputs.iter()
         .map(|r| crypter.clone().set_ctr(0).update(r))
         .collect::<Vec<Vec<u8>>>();
@@ -58,7 +59,7 @@ fn it_works() {
     let streamkey = guess_key(
         tailortexts,
         &[
-            b" -\\\'\"/!?,.:;".to_vec(),
+            br#" -\'"/!?,.:;"#.to_vec(),
             (b'a'..b'z'+1).collect(),
             (b'A'..b'Z'+1).collect(),
             (b'0'..b'9'+1).collect()

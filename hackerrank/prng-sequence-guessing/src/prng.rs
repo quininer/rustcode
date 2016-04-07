@@ -1,5 +1,6 @@
 use std::num::Wrapping;
 
+
 static mut SEED: Wrapping<u64> = Wrapping(0);
 
 pub fn next(bits: usize) -> usize {

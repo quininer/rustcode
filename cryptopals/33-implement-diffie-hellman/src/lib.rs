@@ -4,10 +4,10 @@ extern crate num;
 #[macro_use] extern crate lazy_static;
 
 use rustc_serialize::hex::FromHex;
-use rand::thread_rng;
-use num::bigint::{ BigUint, RandBigInt };
+use num::bigint::{ BigUint };
 use num::traits::{ Zero, One };
 use num::pow;
+pub use rand::thread_rng;
 
 lazy_static! {
     pub static ref P: BigUint ="
@@ -38,37 +38,57 @@ pub struct DH {
 
 impl Default for DH {
     fn default() -> DH {
-        DH::new(P.clone(), G.clone())
+        DH::new(&P, &G)
+    }
+}
+
+#[macro_export]
+macro_rules! rand_big {
+    ( $start:expr, $end:expr ) => {{
+        use num::bigint::RandBigInt;
+        $crate::thread_rng().gen_biguint_range($start, $end)
+    }};
+    ( $end:expr ) => {
+        rand_big!( &$crate::ZERO, $end )
+    };
+    () => {
+        rand_big!( &$crate::P )
     }
 }
 
 impl DH {
-    pub fn new(p: BigUint, g: BigUint) -> DH {
-        let s = thread_rng().gen_biguint_range(&ZERO, &p);
+    pub fn new(p: &BigUint, g: &BigUint) -> DH {
+        DH::from(p, g, &rand_big!())
+    }
+    pub fn new_data(p: &[u8], g: &[u8]) -> DH {
+        DH::new(
+            &BigUint::from_bytes_be(p),
+            &BigUint::from_bytes_be(g)
+        )
+    }
+    pub fn from(p: &BigUint, g: &BigUint, s: &BigUint) -> DH {
         DH {
             p: p.clone(),
             s: s.clone(),
             k: modexp(g.clone(), s.clone(), p.clone())
         }
     }
-    pub fn new_data(p: &[u8], g: &[u8]) -> DH {
-        DH::new(
-            BigUint::from_bytes_be(p),
-            BigUint::from_bytes_be(g)
-        )
-    }
 }
 
 pub trait NumExchange {
-    fn from_num(p: &BigUint, g: &BigUint, pk: &BigUint) -> (BigUint, BigUint);
+    fn num_pk_gen(p: &BigUint, g: &BigUint, pk: &BigUint) -> (BigUint, BigUint);
+    fn num_secret(&self) -> BigUint;
     fn num_public(&self) -> BigUint;
     fn num_exchange(&self, pk: &BigUint) -> BigUint;
 }
 
 impl NumExchange for DH {
-    fn from_num(p: &BigUint, g: &BigUint, pk: &BigUint) -> (BigUint, BigUint) {
-        let dh = DH::new(p.clone(), g.clone());
+    fn num_pk_gen(p: &BigUint, g: &BigUint, pk: &BigUint) -> (BigUint, BigUint) {
+        let dh = DH::new(p, g);
         (dh.num_public(), dh.num_exchange(pk))
+    }
+    fn num_secret(&self) -> BigUint {
+        self.s.clone()
     }
     fn num_public(&self) -> BigUint {
         self.k.clone()

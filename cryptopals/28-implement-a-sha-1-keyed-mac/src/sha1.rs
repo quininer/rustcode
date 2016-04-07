@@ -124,7 +124,7 @@ impl Hasher for Sha1 {
         self.input(bytes)
     }
     fn finish(&self) -> u64 {
-        0
+        unimplemented!()
     }
 }
 

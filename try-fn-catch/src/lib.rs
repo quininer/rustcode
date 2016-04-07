@@ -1,6 +1,6 @@
 #![feature(question_mark)]
 
-macro_rules! try_catch {
+macro_rules! try {
     ( $exec:expr ) => {
         (move || Ok($exec))()
     }
@@ -8,7 +8,7 @@ macro_rules! try_catch {
 
 #[test]
 fn test() {
-    match try_catch!{ Err(())? } {
+    match try!{ Err(())? } {
         Ok(()) => panic!(),
         Err(()) => ()
     }
