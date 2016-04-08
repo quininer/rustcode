@@ -1,0 +1,18 @@
+[package]
+name = "implement-rsa"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-diffie-hellman]
+path = "../33-implement-diffie-hellman"
+
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]
+lazy_static = "*"
+rustc-serialize = "*"
+num = "*"
