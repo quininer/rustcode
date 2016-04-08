@@ -72,13 +72,28 @@ impl Cipher for RSA {
 
 #[test]
 fn it_works() {
-    let plaintext = b"oh my rsa!";
+    use implement_diffie_hellman::ZERO as UZERO;
+
     let rsa = RSA::default();
 
+    let plaintext = b"oh my rsa!";
     let ciphertext = rsa.encrypt(plaintext);
-
     assert_eq!(
         rsa.decrypt(&ciphertext),
         plaintext
+    );
+
+    assert_eq!(
+        BigUint::from_bytes_be(&rsa.encrypt(&UZERO.to_bytes_be())),
+        UZERO.clone()
+    );
+
+    let p1 = BigUint::from(rand!(choose 1..10) as u32);
+    let p2 = BigUint::from(rand!(choose 1..10) as u32);
+    let c1 = BigUint::from_bytes_be(&rsa.encrypt(&p1.to_bytes_be()));
+    let c2 = BigUint::from_bytes_be(&rsa.encrypt(&p2.to_bytes_be()));
+    assert_eq!(
+        BigUint::from_bytes_be(&rsa.decrypt(&(c1 * c2).to_bytes_be())),
+        p1 * p2
     );
 }

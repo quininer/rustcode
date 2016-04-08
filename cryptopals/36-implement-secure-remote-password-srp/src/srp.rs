@@ -61,8 +61,7 @@ impl Server {
 
     pub fn run(&self, sender: Sender<Message>) -> bool {
         let bob_sk = rand_big!(&N);
-        let bob_pk = K.clone() * self.v.clone()
-            + modexp(&G, &bob_sk, &N);
+        let bob_pk = K.clone() * self.v.clone() + modexp(&G, &bob_sk, &N);
         let mut u = None;
         let mut alice_pk_save = None;
         loop {
@@ -151,8 +150,8 @@ impl Client {
                     let s = modexp(
                         &(
                             BigUint::from_bytes_be(&bob_pk)
-                                - K.clone()
-                                * modexp(&G, &x, &N)),
+                                - K.clone() * modexp(&G, &x, &N)
+                        ),
                         &(alice_sk.clone() + u.clone() * x),
                         &N
                     );
