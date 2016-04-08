@@ -46,7 +46,7 @@ impl Server {
         let (sender, receiver) = channel();
         let salt = rand!(32);
         let x = BigUint::from_bytes_be(&Sha256::hash(&[&salt, password].concat()));
-        let v = modexp(G.clone(), x, N.clone());
+        let v = modexp(&G, &x, &N);
 
         (
             Server {
@@ -62,7 +62,7 @@ impl Server {
     pub fn run(&self, sender: Sender<Message>) -> bool {
         let bob_sk = rand_big!(&N);
         let bob_pk = K.clone() * self.v.clone()
-            + modexp(G.clone(), bob_sk.clone(), N.clone());
+            + modexp(&G, &bob_sk, &N);
         let mut u = None;
         let mut alice_pk_save = None;
         loop {
@@ -86,10 +86,12 @@ impl Server {
                     // if A = 0 ?
                     // if A = N**_ ?
                     let s = modexp(
-                        alice_pk_save.clone().unwrap()
-                            * modexp(self.v.clone(), u.clone().unwrap(), N.clone()),
-                        bob_sk.clone(),
-                        N.clone()
+                        &(
+                            alice_pk_save.clone().unwrap()
+                                * modexp(&self.v, &u.unwrap(), &N)
+                        ),
+                        &bob_sk,
+                        &N
                     );
                     let k = Sha256::hash(&s.to_bytes_be());
                     let hmac_value = hmac_sha256(&k, &self.salt);
@@ -128,7 +130,7 @@ impl Client {
 
     pub fn run(&self, sender: Sender<Message>) -> bool {
         let alice_sk = rand_big!(&N);
-        let alice_pk = modexp(G.clone(), alice_sk.clone(), N.clone());
+        let alice_pk = modexp(&G, &alice_sk, &N);
         loop {
             match self.channel.recv() {
                 Ok(Message::Start) => {
@@ -147,11 +149,12 @@ impl Client {
                         self.password.clone()
                     ].concat()));
                     let s = modexp(
-                        BigUint::from_bytes_be(&bob_pk)
-                            - K.clone()
-                            * modexp(G.clone(), x.clone(), N.clone()),
-                        alice_sk.clone() + u.clone() * x,
-                        N.clone()
+                        &(
+                            BigUint::from_bytes_be(&bob_pk)
+                                - K.clone()
+                                * modexp(&G, &x, &N)),
+                        &(alice_sk.clone() + u.clone() * x),
+                        &N
                     );
                     let k = Sha256::hash(&s.to_bytes_be());
                     sender.send(Message::HMAC(hmac_sha256(

@@ -70,7 +70,7 @@ impl DH {
         DH {
             p: p.clone(),
             s: s.clone(),
-            k: modexp(g.clone(), s.clone(), p.clone())
+            k: modexp(g, s, p)
         }
     }
 }
@@ -94,11 +94,13 @@ impl NumExchange for DH {
         self.k.clone()
     }
     fn num_exchange(&self, pk: &BigUint) -> BigUint {
-        modexp(pk.clone(), self.s.clone(), self.p.clone())
+        modexp(pk, &self.s, &self.p)
     }
 }
 
-pub fn modexp(mut base: BigUint, mut exps: BigUint, mods: BigUint) -> BigUint {
+pub fn modexp(base: &BigUint, exps: &BigUint, mods: &BigUint) -> BigUint {
+    let mut base = base.clone();
+    let mut exps = exps.clone();
     let mut out = ONE.clone();
 
     while exps > ZERO.clone() {

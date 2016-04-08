@@ -46,7 +46,7 @@ impl DarkBob {
         BigUint, // N
     ) {
         let bob_sk = rand_big!(&N);
-        let bob_pk = modexp(G.clone(), bob_sk.clone(), N.clone());
+        let bob_pk = modexp(&G, &bob_sk, &N);
         let u = rand!(128);
         let mut alice_pk_save = None;
         loop {
@@ -87,11 +87,11 @@ pub fn password_hash(
     n: &BigUint
 ) -> Vec<u8> {
     let x = Sha256::hash(&[salt, password].concat());
-    let v = modexp(G.clone(), BigUint::from_bytes_be(&x), n.clone());
+    let v = modexp(&G, &BigUint::from_bytes_be(&x), &n);
     let s = modexp(
-        alice_pk.clone() * modexp(v.clone(), u.clone(), n.clone()),
-        bob_sk.clone(),
-        n.clone()
+        &(alice_pk.clone() * modexp(&v, &u, &n)),
+        &bob_sk,
+        &n
     );
     let k = Sha256::hash(&s.to_bytes_be());
     hmac_sha256(&k, salt)

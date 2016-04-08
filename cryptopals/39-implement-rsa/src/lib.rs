@@ -55,16 +55,16 @@ impl RSA {
 impl Cipher for RSA {
     fn encrypt(&self, data: &[u8]) -> Vec<u8> {
         modexp(
-            BigUint::from_bytes_be(data),
-            self.pk.clone(),
-            self.n.clone()
+            &BigUint::from_bytes_be(data),
+            &self.pk,
+            &self.n
         ).to_bytes_be()
     }
     fn decrypt(&self, data: &[u8]) -> Vec<u8> {
         modexp(
-            BigUint::from_bytes_be(data),
-            self.sk.clone().unwrap(),
-            self.n.clone()
+            &BigUint::from_bytes_be(data),
+            &self.sk.clone().unwrap(),
+            &self.n
         ).to_bytes_be()
     }
 }
