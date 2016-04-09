@@ -19,7 +19,6 @@ pub fn next_int(n: usize) -> usize {
         loop {
             bits = next(31);
             val = bits % n;
-            println!("{}", val);
 
             if bits - val + (n - 1) > 0 { break };
         }

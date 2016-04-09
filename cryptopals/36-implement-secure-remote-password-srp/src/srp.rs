@@ -152,17 +152,16 @@ impl Client {
                             BigUint::from_bytes_be(&bob_pk)
                                 - K.clone() * modexp(&G, &x, &N)
                         ),
-                        &(alice_sk.clone() + u.clone() * x),
+                        &(&alice_sk + &u * &x),
                         &N
                     );
-                    let k = Sha256::hash(&s.to_bytes_be());
                     sender.send(Message::HMAC(hmac_sha256(
-                        &k,
+                        &Sha256::hash(&s.to_bytes_be()),
                         &salt
                     ))).ok();
                 },
                 Ok(Message::Ok) => return true,
-                Ok(Message::Fail) => panic!("fail"),
+                Ok(Message::Fail) => return false,
                 _ => unreachable!()
             }
         }

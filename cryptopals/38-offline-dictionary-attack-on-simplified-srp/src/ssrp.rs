@@ -114,12 +114,11 @@ impl Client {
                     ].concat()));
                     let s = modexp(
                         &BigUint::from_bytes_be(&bob_pk),
-                        &(alice_sk.clone() + BigUint::from_bytes_be(&u) * x),
+                        &(&alice_sk + BigUint::from_bytes_be(&u) * x),
                         &N
                     );
-                    let k = Sha256::hash(&s.to_bytes_be());
                     sender.send(Message::HMAC(hmac_sha256(
-                        &k,
+                        &Sha256::hash(&s.to_bytes_be()),
                         &salt
                     ))).ok();
                 },

@@ -1,3 +1,5 @@
+#![feature(slice_patterns)]
+
 extern crate num;
 extern crate rustc_serialize;
 extern crate cbc_bitflipping_attacks;
@@ -5,14 +7,13 @@ extern crate cbc_bitflipping_attacks;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 #[macro_use] extern crate implement_diffie_hellman;
 
-mod inv;
+mod invmod;
 
 use num::BigUint;
-use num::bigint::{ ToBigInt, ToBigUint };
 use rustc_serialize::hex::FromHex;
 use cbc_bitflipping_attacks::Cipher;
 use implement_diffie_hellman::{ modexp, ONE as UONE };
-pub use inv::{ invmod, egcd, ZERO, ONE };
+pub use invmod::{ uinvmod, invmod, egcd, ZERO, ONE };
 
 
 lazy_static!{
@@ -24,25 +25,19 @@ lazy_static!{
 
 pub struct RSA {
     sk: Option<BigUint>,
-    pk: BigUint,
-    n : BigUint
+    pub pk: BigUint,
+    pub n : BigUint
 }
 
 impl Default for RSA {
     fn default() -> RSA {
-        let p = &rand!(choose PRIMES.clone());
-        let q = &rand!(choose PRIMES.clone());
+        let r = rand!(choose PRIMES.clone(), 2);
+        let (p, q) = (&r[0], &r[1]);
+        let e = BigUint::from(3u32);
         let n = p * q;
         let et = (p - UONE.clone()) * (q - UONE.clone());
-        let e = BigUint::from(3u32);
 
-        // FIXME BigInt or BigUint ?
-        let d = invmod(
-            &e.to_bigint().unwrap(),
-            &et.to_bigint().unwrap()
-        ).and_then(|u| u.to_biguint());
-
-        RSA::new(&d, &e, &n)
+        RSA::new(&uinvmod(&e, &et), &e, &n)
     }
 }
 

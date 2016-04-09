@@ -42,9 +42,8 @@ impl ScarletAlice {
                     )).ok();
                 },
                 Ok(Message::Exchange(salt, _)) => {
-                    let k = Sha256::hash(&ZERO.to_bytes_be());
                     sender.send(Message::HMAC(hmac_sha256(
-                        &k,
+                        &Sha256::hash(&ZERO.to_bytes_be()),
                         &salt
                     ))).ok();
                 },

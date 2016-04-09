@@ -13,8 +13,11 @@ macro_rules! rand {
         use $crate::Rng;
         $crate::thread_rng().gen_iter().take($len).collect::<Vec<u8>>()
     }};
+    ( choose $range:expr, $num:expr ) => {
+        $crate::sample(&mut $crate::thread_rng(), $range, $num)
+    };
     ( choose $range:expr ) => {
-        $crate::sample(&mut $crate::thread_rng(), $range, 1)[0]
+        rand!(choose $range, 1)[0]
     };
     () => { rand!(16) }
 }
