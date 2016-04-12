@@ -1,0 +1,23 @@
+[package]
+name = "bleichenbachers-e-eq-3-rsa-attack"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-an-e-eq-3-rsa-broadcast-attack]
+path = "../40-implement-an-e-eq-3-rsa-broadcast-attack"
+
+[dependencies.implement-rsa]
+path = "../39-implement-rsa"
+
+[dependencies.implement-diffie-hellman]
+path = "../33-implement-diffie-hellman"
+
+[dependencies.implement-a-sha-1-keyed-mac]
+path = "../28-implement-a-sha-1-keyed-mac"
+
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
+[dependencies]
+num = "*"
+regex = "*"

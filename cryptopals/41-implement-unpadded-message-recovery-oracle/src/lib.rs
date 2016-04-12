@@ -19,6 +19,12 @@ pub struct RsaOracle {
     rsa: RSA
 }
 
+impl Default for RsaOracle {
+    fn default() -> RsaOracle {
+        RsaOracle::new()
+    }
+}
+
 impl RsaOracle {
     pub fn new() -> RsaOracle {
         RsaOracle {
@@ -45,7 +51,7 @@ pub fn crack_rsa_with_decryptor(rsa: &RSA, ciphertext: &[u8], mut decryptor: Dec
     let s = rand_big!(&(ONE.clone() + ONE.clone()), &rsa.n);
     let cc = (
         modexp(&s, &rsa.e, &rsa.n)
-        * BigUint::from_bytes_be(ciphertext)
+            * BigUint::from_bytes_be(ciphertext)
     ) % &rsa.n;
     let cp = BigUint::from_bytes_be(&decryptor(&cc.to_bytes_be()));
     let plaintext = (cp * &uinvmod(&s, &rsa.n).unwrap()) % &rsa.n;
