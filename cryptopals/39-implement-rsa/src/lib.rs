@@ -23,6 +23,7 @@ lazy_static!{
         .collect();
 }
 
+#[derive(Clone)]
 pub struct RSA {
     sk: Option<BigUint>,
     pub pk: BigUint,
@@ -34,16 +35,28 @@ impl Default for RSA {
         let r = rand!(choose PRIMES.clone(), 2);
         let (p, q) = (&r[0], &r[1]);
         let e = BigUint::from(3u32);
-        let n = p * q;
-        let et = (p - UONE.clone()) * (q - UONE.clone());
 
-        RSA::new(&uinvmod(&e, &et), &e, &n)
+        RSA::from(p, q, &e)
     }
 }
 
 impl RSA {
     pub fn new(sk: &Option<BigUint>, pk: &BigUint, n: &BigUint) -> RSA {
         RSA { sk: sk.clone(), pk: pk.clone(), n: n.clone() }
+    }
+
+    pub fn from(p: &BigUint, q: &BigUint, e: &BigUint) -> RSA {
+        let n = p * q;
+        let et = (p - UONE.clone()) * (q - UONE.clone());
+        RSA::new(&uinvmod(&e, &et), &e, &n)
+    }
+
+    pub fn public(&self) -> RSA {
+        RSA {
+            sk: None,
+            pk: self.pk.clone(),
+            n: self.n.clone()
+        }
     }
 }
 
@@ -72,7 +85,7 @@ fn it_works() {
     let rsa = RSA::default();
 
     let plaintext = b"oh my rsa!";
-    let ciphertext = rsa.encrypt(plaintext);
+    let ciphertext = rsa.public().encrypt(plaintext);
     assert_eq!(
         rsa.decrypt(&ciphertext),
         plaintext
