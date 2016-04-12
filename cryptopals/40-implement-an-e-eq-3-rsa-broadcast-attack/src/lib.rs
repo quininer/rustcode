@@ -1,8 +1,8 @@
 extern crate num;
 extern crate implement_rsa;
 extern crate cbc_bitflipping_attacks;
+extern crate implement_diffie_hellman;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
-#[macro_use] extern crate implement_diffie_hellman;
 
 use num::BigUint;
 use implement_diffie_hellman::{ ONE, ZERO };
@@ -32,7 +32,7 @@ pub fn cube_root(n: &BigUint, e: usize) -> BigUint {
     &low + ONE.clone()
 }
 
-pub fn crack_with_crt(ciphers: &Vec<(RSA, Vec<u8>)>, exps: usize) -> Vec<u8> {
+pub fn crack_rsa_with_crt(ciphers: &[(RSA, Vec<u8>)], exps: usize) -> Vec<u8> {
     let n012 = ciphers.iter()
         .map(|r| r.0.n.clone())
         .fold(ONE.clone(), |sum, next| sum * next);
@@ -55,21 +55,22 @@ pub fn crack_with_crt(ciphers: &Vec<(RSA, Vec<u8>)>, exps: usize) -> Vec<u8> {
 
 #[test]
 fn it_works() {
+    use num::ToPrimitive;
     use cbc_bitflipping_attacks::Cipher;
-    use implement_rsa::PRIMES;
+    use implement_rsa::{ PRIMES, E };
 
     let plaintext = rand!(16);
-    let e = 3;
 
-    let ciphers = rand!(choose PRIMES.clone(), 6)
+    let ciphers: Vec<(RSA, Vec<u8>)> = rand!(choose PRIMES.clone(), 6)
         .chunks(2)
         .map(|pq| {
-            let rsa = RSA::from(&pq[0], &pq[1], &BigUint::from(e));
+            let rsa = RSA::from(&pq[0], &pq[1], &E);
             (rsa.public(), rsa.encrypt(&plaintext))
         }).collect();
 
+    assert_eq!(E.to_u64(), Some(3));
     assert_eq!(
-        crack_with_crt(&ciphers, e),
+        crack_rsa_with_crt(&ciphers, E.to_u64().unwrap() as usize),
         plaintext
     );
 }

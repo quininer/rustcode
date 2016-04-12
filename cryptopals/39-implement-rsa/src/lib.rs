@@ -21,12 +21,13 @@ lazy_static!{
         .map(|u| u.from_hex().unwrap())
         .map(|u| BigUint::from_bytes_be(&u))
         .collect();
+    pub static ref E: BigUint = BigUint::from(3u32);
 }
 
 #[derive(Clone)]
 pub struct RSA {
     sk: Option<BigUint>,
-    pub pk: BigUint,
+    pub e: BigUint,
     pub n : BigUint
 }
 
@@ -34,15 +35,14 @@ impl Default for RSA {
     fn default() -> RSA {
         let r = rand!(choose PRIMES.clone(), 2);
         let (p, q) = (&r[0], &r[1]);
-        let e = BigUint::from(3u32);
 
-        RSA::from(p, q, &e)
+        RSA::from(p, q, &E)
     }
 }
 
 impl RSA {
-    pub fn new(sk: &Option<BigUint>, pk: &BigUint, n: &BigUint) -> RSA {
-        RSA { sk: sk.clone(), pk: pk.clone(), n: n.clone() }
+    pub fn new(sk: &Option<BigUint>, e: &BigUint, n: &BigUint) -> RSA {
+        RSA { sk: sk.clone(), e: e.clone(), n: n.clone() }
     }
 
     pub fn from(p: &BigUint, q: &BigUint, e: &BigUint) -> RSA {
@@ -54,7 +54,7 @@ impl RSA {
     pub fn public(&self) -> RSA {
         RSA {
             sk: None,
-            pk: self.pk.clone(),
+            e: self.e.clone(),
             n: self.n.clone()
         }
     }
@@ -64,7 +64,7 @@ impl Cipher for RSA {
     fn encrypt(&self, data: &[u8]) -> Vec<u8> {
         modexp(
             &BigUint::from_bytes_be(data),
-            &self.pk,
+            &self.e,
             &self.n
         ).to_bytes_be()
     }
