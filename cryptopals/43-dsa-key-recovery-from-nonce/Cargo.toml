@@ -16,5 +16,6 @@ path = "../33-implement-diffie-hellman"
 path = "../28-implement-a-sha-1-keyed-mac"
 
 [dependencies]
+rustc-serialize = "*"
 lazy_static = "*"
 num = "*"

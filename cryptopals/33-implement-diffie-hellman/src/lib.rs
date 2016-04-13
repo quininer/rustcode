@@ -4,25 +4,33 @@ extern crate num;
 #[macro_use] extern crate lazy_static;
 
 pub use rustc_serialize::hex::FromHex;
-pub use num::BigUint;
+pub use num::{ BigUint, BigInt };
+pub use num::bigint::Sign;
 use num::traits::{ Zero, One };
 use num::pow;
 pub use rand::thread_rng;
 
 
 #[macro_export]
-macro_rules! hex_to_biguint {
-    ( $hex:expr ) => {{
+macro_rules! hex_to_bigint {
+    ( u $hex:expr ) => {{
         use $crate::FromHex;
         $hex
             .from_hex()
             .map(|n| $crate::BigUint::from_bytes_be(&n))
             .unwrap()
+    }};
+    ( $hex:expr ) => {{
+        use $crate::FromHex;
+        $hex
+            .from_hex()
+            .map(|n| $crate::BigInt::from_bytes_be($crate::Sign::Plus, &n))
+            .unwrap()
     }}
 }
 
 lazy_static! {
-    pub static ref P: BigUint = hex_to_biguint!("
+    pub static ref P: BigUint = hex_to_bigint!(u"
 ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024
 e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd
 3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec
@@ -112,7 +120,7 @@ pub fn modexp(base: &BigUint, exps: &BigUint, mods: &BigUint) -> BigUint {
     let mut exps = exps.clone();
     let mut out = ONE.clone();
 
-    while exps > ZERO.clone() {
+    while exps > *ZERO {
         if exps.clone() & ONE.clone() == ONE.clone() {
             out = out * base.clone() % mods.clone();
         }

@@ -6,7 +6,7 @@ use super::{ Sha256, hmac_sha256 };
 
 
 lazy_static!{
-    pub static ref N: BigUint = hex_to_biguint!("
+    pub static ref N: BigUint = hex_to_bigint!(u"
 000001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ffffffff");
