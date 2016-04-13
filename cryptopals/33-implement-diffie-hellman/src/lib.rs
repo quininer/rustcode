@@ -15,7 +15,7 @@ macro_rules! hex_to_biguint {
     ( $hex:expr ) => {{
         use $crate::FromHex;
         $hex
-            .from_hex().ok()
+            .from_hex()
             .map(|n| $crate::BigUint::from_bytes_be(&n))
             .unwrap()
     }}

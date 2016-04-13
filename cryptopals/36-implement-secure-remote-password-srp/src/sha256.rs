@@ -28,8 +28,9 @@ impl Digest for Sha256 {
 }
 
 impl TraitHasher for Sha256 {
+    #[allow(unused_must_use)]
     fn write(&mut self, bytes: &[u8]) {
-        drop(self.0.write(bytes));
+        self.0.write(bytes);
     }
     fn finish(&self) -> u64 {
         unimplemented!()
