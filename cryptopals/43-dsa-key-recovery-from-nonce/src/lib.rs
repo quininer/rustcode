@@ -61,7 +61,7 @@ fn it_works() {
     let msghash = hex_to_bigint!(u"d2d0714f014a9784047eaeccf956520045c45265");
 
     // missing leading zero..
-    let y: BigUint = hex_to_bigint!(u"
+    let y = hex_to_bigint!(u"
 084ad4719d044495496a3201c8ff484feb45b962e7302e56a392aee4
 abab3e4bdebf2955b4736012f21a08084056b19bcd7fee56048e004
 e44984e2f411788efdc837a0d2e5abb7b555039fd243ac01f0fb2ed
