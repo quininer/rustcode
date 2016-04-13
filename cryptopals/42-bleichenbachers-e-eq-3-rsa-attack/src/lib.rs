@@ -17,10 +17,10 @@ use cbc_bitflipping_attacks::Cipher;
 
 pub fn padding(digest: &[u8]) -> Vec<u8> {
     [
-        "\x00\x01".as_bytes(),
-        &vec![b'\xff'; 128 - digest.len() - 3],
-        "\x00".as_bytes(),
-        digest
+        vec![0x00, 0x01],
+        vec![0xff; 128 - digest.len() - 3],
+        vec![0x00],
+        digest.into()
     ].concat()
 }
 
@@ -38,18 +38,19 @@ impl Signer for RSA {
 
         // XXX because bytes to bituint missing leading zero.
         // r"\x00\x01\xff+?\x00(.{20})"
-        Regex::new(r"\x01\xff+?\x00(.{20})").unwrap()
+        Regex::new(r"\x01\xff+?\x00([\x00-\xff]{20})").unwrap()
             .captures(&block)
-            .map_or(false, |matches| Sha1::hash(data) == matches.at(1).unwrap())
+            .and_then(|matches| matches.at(1))
+            .map_or(false, |matches| Sha1::hash(data) == matches)
     }
 }
 
 pub fn crack_rsa_sign_bleichenbachers(message: &[u8]) -> Vec<u8> {
     let digest = Sha1::hash(message);
     let block = [
-        vec![b'\x00', b'\x01', b'\xff', b'\x00'],
+        vec![0x00, 0x01, 0xff, 0x00],
         digest.clone(),
-        vec![b'\x00'; 128 - digest.len() - 4]
+        vec![0x00; 128 - digest.len() - 4]
     ].concat();
     (
         floor_root(&BigUint::from_bytes_be(&block), 3)
@@ -60,7 +61,7 @@ pub fn crack_rsa_sign_bleichenbachers(message: &[u8]) -> Vec<u8> {
 
 #[test]
 fn it_works() {
-    let message = b"oh my rsa signature!";
+    let message = b"hi mom";
     let rsa = RSA::default();
 
     let fake_signature = crack_rsa_sign_bleichenbachers(message);
@@ -69,7 +70,7 @@ fn it_works() {
 
 #[test]
 fn test_sign() {
-    let message = b"oh my rsa signature!";
+    let message = b"hi mom";
     let rsa = RSA::default();
     let signature = rsa.sign(message);
 

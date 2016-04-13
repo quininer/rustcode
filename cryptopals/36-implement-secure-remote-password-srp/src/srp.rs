@@ -1,19 +1,15 @@
 use std::sync::mpsc::{ channel, Sender, Receiver };
 use num::BigUint;
-use rustc_serialize::hex::FromHex;
 use implement_diffie_hellman::{ G, modexp };
 use implement_a_sha_1_keyed_mac::Digest;
 use super::{ Sha256, hmac_sha256 };
 
 
 lazy_static!{
-    pub static ref N: BigUint = "
+    pub static ref N: BigUint = hex_to_biguint!("
 000001ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
 ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-ffffffff"
-        .from_hex().ok()
-        .map(|n| BigUint::from_bytes_be(&n))
-        .unwrap();
+ffffffff");
     pub static ref K: BigUint = BigUint::from(3u32);
 }
 

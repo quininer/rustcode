@@ -1,6 +1,5 @@
 extern crate num;
 extern crate openssl;
-extern crate rustc_serialize;
 extern crate implement_a_sha_1_keyed_mac;
 extern crate implement_and_break_hmac_sha1_with_an_artificial_timing_leak;
 extern crate implement_a_mitm_key_fixing_attack_on_diffie_hellman_with_parameter_injection;
