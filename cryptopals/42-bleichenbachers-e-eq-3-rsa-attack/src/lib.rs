@@ -45,7 +45,7 @@ impl Signer for RSA {
     }
 }
 
-pub fn crack_rsa_sign_bleichenbachers(message: &[u8]) -> Vec<u8> {
+pub fn crack_rsa_sign_bleichenbachers_eeq3(message: &[u8]) -> Vec<u8> {
     let digest = Sha1::hash(message);
     let block = [
         vec![0x00, 0x01, 0xff, 0x00],
@@ -64,7 +64,7 @@ fn it_works() {
     let message = b"hi mom";
     let rsa = RSA::default();
 
-    let fake_signature = crack_rsa_sign_bleichenbachers(message);
+    let fake_signature = crack_rsa_sign_bleichenbachers_eeq3(message);
     assert!(rsa.verify(message, &fake_signature));
 }
 

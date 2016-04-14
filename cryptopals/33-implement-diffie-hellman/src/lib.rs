@@ -125,8 +125,8 @@ pub fn modexp(base: &BigUint, exps: &BigUint, mods: &BigUint) -> BigUint {
             out = out * base.clone() % mods.clone();
         }
 
-        base = pow(base.clone(), 2);
-        base = base % mods.clone();
+        base = pow(base, 2);
+        base = base % mods;
         exps = exps >> 1;
     }
 

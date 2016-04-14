@@ -1,22 +1,15 @@
 [package]
-name = "dsa-key-recovery-from-nonce"
+name = "dsa-parameter-tampering"
 version = "0.1.0"
 authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.dsa-key-recovery-from-nonce]
+path = "../43-dsa-key-recovery-from-nonce"
 
 [dependencies.bleichenbachers-e-eq-3-rsa-attack]
 path = "../42-bleichenbachers-e-eq-3-rsa-attack"
 
-[dependencies.implement-rsa]
-path = "../39-implement-rsa"
-
 [dependencies.implement-diffie-hellman]
 path = "../33-implement-diffie-hellman"
 
-[dependencies.implement-a-sha-1-keyed-mac]
-path = "../28-implement-a-sha-1-keyed-mac"
-
 [dependencies]
-rustc-serialize = "*"
-lazy_static = "*"
-rmp = "*"
-num = "*"

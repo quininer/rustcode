@@ -43,6 +43,7 @@ fn it_works() {
                 num::bigint::Sign::Plus,
                 &Sha1::hash(&r[0][5..].as_bytes())
             )
+            // XXX missing zero
             // hex_to_bigint!(&r[3][3..])
         ))
         .collect();

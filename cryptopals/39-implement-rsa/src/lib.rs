@@ -7,6 +7,7 @@ extern crate cbc_bitflipping_attacks;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 #[macro_use] extern crate implement_diffie_hellman;
 
+// mod primes;
 mod invmod;
 
 use num::BigUint;
@@ -41,6 +42,10 @@ impl Default for RSA {
 }
 
 impl RSA {
+    // pub fn with_size(size: usize) -> RSA {
+    //     unimplemented!()
+    // }
+
     pub fn new(sk: &Option<BigUint>, e: &BigUint, n: &BigUint) -> RSA {
         RSA { sk: sk.clone(), e: e.clone(), n: n.clone() }
     }
