@@ -62,7 +62,7 @@ pub fn crack_rsa_sign_bleichenbachers_eeq3(message: &[u8]) -> Vec<u8> {
 #[test]
 fn it_works() {
     let message = b"hi mom";
-    let rsa = RSA::default();
+    let rsa = RSA::with_size(1024);
 
     let fake_signature = crack_rsa_sign_bleichenbachers_eeq3(message);
     assert!(rsa.verify(message, &fake_signature));
@@ -71,7 +71,7 @@ fn it_works() {
 #[test]
 fn test_sign() {
     let message = b"hi mom";
-    let rsa = RSA::default();
+    let rsa = RSA::with_size(1024);
     let signature = rsa.sign(message);
 
     assert!(rsa.verify(message, &signature));

@@ -56,17 +56,16 @@ pub fn crack_rsa_with_crt(ciphers: &[(RSA, Vec<u8>)], exps: usize) -> Vec<u8> {
 fn it_works() {
     use num::ToPrimitive;
     use cbc_bitflipping_attacks::Cipher;
-    use implement_rsa::{ PRIMES, E };
+    use implement_rsa::E;
 
     let plaintext = rand!(16);
     let e = E.to_u64().map(|n| n as usize);
 
     assert_eq!(e, Some(3));
 
-    let ciphers: Vec<(RSA, Vec<u8>)> = rand!(choose PRIMES.clone(), e.unwrap() * 2)
-        .chunks(2)
-        .map(|pq| {
-            let rsa = RSA::from(&pq[0], &pq[1], &E);
+    let ciphers: Vec<(RSA, Vec<u8>)> = (0..e.unwrap())
+        .map(|_| {
+            let rsa = RSA::default();
             (rsa.public(), rsa.encrypt(&plaintext))
         })
         .collect();

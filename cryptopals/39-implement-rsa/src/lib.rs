@@ -97,6 +97,12 @@ fn it_works() {
         plaintext
     );
 
+    let signature = rsa.decrypt(plaintext);
+    assert_eq!(
+        rsa.encrypt(&signature),
+        plaintext
+    );
+
     assert_eq!(
         BigUint::from_bytes_be(&rsa.encrypt(&UZERO.to_bytes_be())),
         UZERO.clone()

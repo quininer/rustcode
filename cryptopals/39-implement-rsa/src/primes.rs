@@ -5,9 +5,10 @@ use implement_diffie_hellman::{ modexp, ZERO, ONE, TWO };
 pub const SMALL_PRIMES: [usize; 8] = [2, 3, 5, 7, 11, 13, 17, 19];
 
 pub fn gen_prime(size: usize) -> BigUint {
+    let mut p = rand_big!(: size);
     loop {
-        let p = rand_big!(: size);
         if is_prime(&p) { return p };
+        p = &p + if p.is_even() { ONE.clone() } else { TWO.clone() };
     }
 }
 
