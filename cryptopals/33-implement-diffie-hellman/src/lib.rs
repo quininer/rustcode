@@ -41,6 +41,7 @@ bb9ed529077096966d670c354e4abc9804f1746c08ca237327fff
 fffffffffffff");
     pub static ref G: BigUint = BigUint::from(2u32);
 
+    pub static ref TWO: BigUint = BigUint::from(2u32);
     pub static ref ONE: BigUint = BigUint::one();
     pub static ref ZERO: BigUint = BigUint::zero();
 }
@@ -61,6 +62,10 @@ impl Default for DH {
 
 #[macro_export]
 macro_rules! rand_big {
+    ( : $size:expr ) => {{
+        use num::bigint::RandBigInt;
+        $crate::thread_rng().gen_biguint($size)
+    }};
     ( $start:expr, $end:expr ) => {{
         use num::bigint::RandBigInt;
         $crate::thread_rng().gen_biguint_range($start, $end)

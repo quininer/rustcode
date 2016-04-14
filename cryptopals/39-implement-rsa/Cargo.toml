@@ -14,5 +14,4 @@ path = "../11-an-ebccbc-detection-oracle"
 
 [dependencies]
 lazy_static = "*"
-rustc-serialize = "*"
 num = "*"

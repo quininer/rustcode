@@ -1,27 +1,22 @@
 #![feature(slice_patterns)]
 
 extern crate num;
-extern crate rustc_serialize;
 extern crate cbc_bitflipping_attacks;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 #[macro_use] extern crate implement_diffie_hellman;
 
-// mod primes;
+mod primes;
 mod invmod;
 
 use num::BigUint;
-use rustc_serialize::hex::FromHex;
 use cbc_bitflipping_attacks::Cipher;
 use implement_diffie_hellman::{ modexp, ONE as UONE };
 pub use invmod::{ uinvmod, invmod, egcd, ZERO, ONE };
+pub use primes::{ SMALL_PRIMES, gen_prime, is_prime };
 
 
 lazy_static!{
-    pub static ref PRIMES: Vec<BigUint> = include_str!("primes.txt").lines()
-        .map(|u| u.from_hex().unwrap())
-        .map(|u| BigUint::from_bytes_be(&u))
-        .collect();
     pub static ref E: BigUint = BigUint::from(3u32);
 }
 
@@ -34,17 +29,23 @@ pub struct RSA {
 
 impl Default for RSA {
     fn default() -> RSA {
-        let r = rand!(choose PRIMES.clone(), 2);
-        let (p, q) = (&r[0], &r[1]);
-
-        RSA::from(p, q, &E)
+        RSA::with_size(128)
     }
 }
 
 impl RSA {
-    // pub fn with_size(size: usize) -> RSA {
-    //     unimplemented!()
-    // }
+    pub fn with_size(size: usize) -> RSA {
+        let mut p = E.clone() + UONE.clone();
+        while &p % E.clone() == UONE.clone() {
+            p = gen_prime(size);
+        }
+        let mut q = E.clone() + UONE.clone();
+        while &q % E.clone() == UONE.clone() {
+            q = gen_prime(size);
+        }
+
+        RSA::from(&p, &q, &E)
+    }
 
     pub fn new(sk: &Option<BigUint>, e: &BigUint, n: &BigUint) -> RSA {
         RSA { sk: sk.clone(), e: e.clone(), n: n.clone() }

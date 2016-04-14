@@ -5,20 +5,19 @@ extern crate implement_diffie_hellman;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use num::BigUint;
-use implement_diffie_hellman::{ ONE, ZERO };
+use implement_diffie_hellman::{ TWO, ONE, ZERO };
 use implement_rsa::{ RSA, uinvmod };
 
 
 pub fn floor_root(n: &BigUint, e: usize) -> BigUint {
-    let two = BigUint::from(2u32);
     let mut high = ONE.clone();
     while &num::pow(high.clone(), e) < n {
-        high = &high * &two;
+        high = &high * TWO.clone();
     }
-    let mut low = &high / &two;
+    let mut low = &high / TWO.clone();
 
     while &low < &high {
-        let mid = (&low + &high) / &two;
+        let mid = (&low + &high) / TWO.clone();
         let p = num::pow(mid.clone(), e);
         if low < mid && p < n.clone() {
             low = mid;
