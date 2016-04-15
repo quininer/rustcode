@@ -24,7 +24,7 @@ pub fn is_prime(p: &BigUint) -> bool {
 
 /// simple, inexact, but fast.
 fn check(p: &BigUint) -> bool {
-    (0..p.bits() / 25).all(|_| modexp(&rand_big!(&ONE, &p), &(p - ONE.clone()), &p) == *ONE)
+    (0..5).all(|_| modexp(&rand_big!(&ONE, &p), &(p - ONE.clone()), &p) == *ONE)
 }
 
 #[allow(dead_code)]
