@@ -22,7 +22,7 @@ lazy_static!{
 
 #[derive(Clone)]
 pub struct RSA {
-    sk: Option<BigUint>,
+    pub d: Option<BigUint>,
     pub e: BigUint,
     pub n : BigUint
 }
@@ -40,26 +40,26 @@ impl RSA {
             p = gen_prime(size >> 1);
         }
         let mut q = E.clone() + UONE.clone();
-        while &q % E.clone() == UONE.clone() {
+        while &q % E.clone() == UONE.clone() || &q == &p {
             q = gen_prime(size - (size >> 1));
         }
 
         RSA::from(&p, &q, &E)
     }
 
-    pub fn new(sk: &Option<BigUint>, e: &BigUint, n: &BigUint) -> RSA {
-        RSA { sk: sk.clone(), e: e.clone(), n: n.clone() }
-    }
-
     pub fn from(p: &BigUint, q: &BigUint, e: &BigUint) -> RSA {
         let n = p * q;
         let et = (p - UONE.clone()) * (q - UONE.clone());
-        RSA::new(&uinvmod(&e, &et), &e, &n)
+        RSA {
+            d: uinvmod(&e, &et),
+            e: e.clone(),
+            n: n.clone()
+        }
     }
 
     pub fn public(&self) -> RSA {
         RSA {
-            sk: None,
+            d: None,
             e: self.e.clone(),
             n: self.n.clone()
         }
@@ -77,7 +77,7 @@ impl Cipher for RSA {
     fn decrypt(&self, data: &[u8]) -> Vec<u8> {
         modexp(
             &BigUint::from_bytes_be(data),
-            &self.sk.clone().unwrap(),
+            &self.d.clone().unwrap(),
             &self.n
         ).to_bytes_be()
     }

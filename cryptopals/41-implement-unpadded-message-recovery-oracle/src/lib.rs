@@ -29,7 +29,7 @@ impl RsaOracle {
     pub fn new() -> RsaOracle {
         RsaOracle {
             set: HashSet::new(),
-            rsa: RSA::default()
+            rsa: RSA::with_size(256)
         }
     }
     pub fn public(&self) -> RSA {

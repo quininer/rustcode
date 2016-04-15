@@ -10,9 +10,9 @@ use implement_diffie_hellman::{ modexp, TWO, ONE, ZERO };
 
 
 /// 1 -> true, 2 -> false
-pub type ParityVerify = Box<Fn(&[u8]) -> bool>;
+pub type ParityVerifyer = Box<Fn(&[u8]) -> bool>;
 
-pub fn crack_rsa_with_parity_decryptor(rsa: &RSA, ciphertext: &[u8], verify: ParityVerify) -> Vec<u8> {
+pub fn crack_rsa_with_parity_decryptor(rsa: &RSA, ciphertext: &[u8], verify: ParityVerifyer) -> Vec<u8> {
     let mut ciphernum = BigUint::from_bytes_be(ciphertext);
     let k = modexp(&TWO, &rsa.e, &rsa.n);
     let (mut low, mut high, mut count) = (ZERO.clone(), ONE.clone(), ONE.clone());

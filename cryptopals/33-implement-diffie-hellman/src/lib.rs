@@ -7,7 +7,7 @@ pub use rustc_serialize::hex::FromHex;
 pub use num::{ BigUint, BigInt };
 pub use num::bigint::Sign;
 use num::traits::{ Zero, One };
-use num::pow;
+use num::{ pow, Integer };
 pub use rand::thread_rng;
 
 
@@ -126,12 +126,11 @@ pub fn modexp(base: &BigUint, exps: &BigUint, mods: &BigUint) -> BigUint {
     let mut out = ONE.clone();
 
     while exps > *ZERO {
-        if exps.clone() & ONE.clone() == ONE.clone() {
-            out = out * base.clone() % mods.clone();
+        if !exps.is_even() {
+            out = &out * &base % mods;
         }
 
-        base = pow(base, 2);
-        base = base % mods;
+        base = pow(base, 2) % mods;
         exps = exps >> 1;
     }
 

@@ -65,7 +65,7 @@ fn it_works() {
 
     let ciphers: Vec<(RSA, Vec<u8>)> = (0..e.unwrap())
         .map(|_| {
-            let rsa = RSA::default();
+            let rsa = RSA::with_size(256);
             (rsa.public(), rsa.encrypt(&plaintext))
         })
         .collect();

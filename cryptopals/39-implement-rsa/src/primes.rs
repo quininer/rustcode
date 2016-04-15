@@ -11,7 +11,6 @@ pub fn gen_prime(size: usize) -> BigUint {
 }
 
 pub fn is_prime(p: &BigUint) -> bool {
-    if p.is_even() { return false };
     for &n in SMALL_PRIMES.iter().take(100) {
         let n = BigUint::from(n);
         if p == &n { return true };

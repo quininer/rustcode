@@ -100,15 +100,17 @@ pub fn password_hash(
 
 #[test]
 fn it_works() {
+    use std::fs::File;
+    use std::io::Read;
     use std::thread::spawn;
 
-    let dict: Vec<Vec<u8>> = vec![
-        "imbob".into(),
-        "uarealice".into(),
-        "imalice".into(),
-    ];
+    let mut dict = String::new();
+    File::open("/usr/share/dict/cracklib-small").unwrap()
+        .read_to_string(&mut dict).unwrap();
+    let dict: Vec<Vec<u8>> = dict.lines().map(|p| p.into()).collect();
+
     let email = b"alice@bob.com";
-    let password = b"imalice";
+    let password = b"abc";
 
     let (evil_server, server_channel) = DarkBob::new(email);
     let (client, client_channel) = Client::new(email, password);
@@ -119,8 +121,8 @@ fn it_works() {
 
     let (hash, salt, alice_pk, bob_sk, u, n) = bob_task.join().unwrap();
     let guess_password = dict.iter()
-        .find(move |&word| password_hash(
-            &word,
+        .find(move |&p| password_hash(
+            &p,
             &salt,
             &alice_pk,
             &bob_sk,

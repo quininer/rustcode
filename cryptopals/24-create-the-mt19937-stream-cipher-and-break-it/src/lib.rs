@@ -49,7 +49,7 @@ fn test_token() {
 fn test_crack_mt_mtream_cipher() {
     use implement_ctr_the_stream_cipher_mode::StreamCipher;
 
-    let key: u16 = rand!(x);
+    let key: u16 = rand!(_);
     let mut mt_cipher = MT19937::new(key as u32);
     let known_plaintext = b"AAAAAAAAAAAAAA";
     let ciphertext = mt_cipher.update(&[
@@ -75,7 +75,7 @@ fn test_crack_mt_mtream_cipher() {
 fn test_mt_stream_cipher() {
     use implement_ctr_the_stream_cipher_mode::StreamCipher;
 
-    let key: u16 = rand!(x);
+    let key: u16 = rand!(_);
     let data = rand!();
     assert_eq!(
         data,
