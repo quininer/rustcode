@@ -37,11 +37,11 @@ impl RSA {
     pub fn with_size(size: usize) -> RSA {
         let mut p = E.clone() + UONE.clone();
         while &p % E.clone() == UONE.clone() {
-            p = gen_prime(size);
+            p = gen_prime(size >> 1);
         }
         let mut q = E.clone() + UONE.clone();
         while &q % E.clone() == UONE.clone() {
-            q = gen_prime(size);
+            q = gen_prime(size - (size >> 1));
         }
 
         RSA::from(&p, &q, &E)
