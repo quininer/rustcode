@@ -41,6 +41,7 @@ bb9ed529077096966d670c354e4abc9804f1746c08ca237327fff
 fffffffffffff");
     pub static ref G: BigUint = BigUint::from(2u32);
 
+    pub static ref THREE: BigUint = BigUint::from(3u32);
     pub static ref TWO: BigUint = BigUint::from(2u32);
     pub static ref ONE: BigUint = BigUint::one();
     pub static ref ZERO: BigUint = BigUint::zero();
