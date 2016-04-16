@@ -31,7 +31,7 @@ pub fn encryption_oracle(data: Vec<u8>) -> (bool, Vec<u8>) {
 
     let key = rand!();
 
-    let (x, c) = if random() {
+    let (x, c) = if rand!(_) {
         let ecb = Crypter::new(Type::AES_128_ECB);
         ecb.init(Mode::Encrypt, &key, &[]);
         ecb.pad(true);
@@ -56,7 +56,7 @@ fn it_works() {
     let mut count = 0;
 
     for _ in 0..total {
-        let (r, data) = encryption_oracle(vec![random(); rand!(choose 32..96)]);
+        let (r, data) = encryption_oracle(vec![rand!(_); rand!(choose 32..96)]);
         if (repetition_rate(&data, 16) > 0.3) == r {
             count += 1;
         }
