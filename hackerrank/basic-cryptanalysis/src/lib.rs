@@ -32,10 +32,7 @@ pub fn is_matching(origin: &str, word: &str) -> bool {
 
         for c in word.chars() {
             let len = tablet.len();
-            out.push(
-                *tablet.entry(c)
-                    .or_insert(len)
-            );
+            out.push(*tablet.entry(c).or_insert(len));
         }
 
         out
@@ -76,7 +73,7 @@ fn test() {
 
     for (w, d) in input
         .split_whitespace()
-        .map(|w| w. to_lowercase())
+        .map(|w| w.to_lowercase())
         .map(|w| (
             w.clone(),
             dict.get(&w.len()).unwrap_or(&HashSet::new()).clone()

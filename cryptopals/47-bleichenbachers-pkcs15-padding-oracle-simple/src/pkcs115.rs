@@ -14,8 +14,8 @@ pub fn padding(data: &[u8], len: usize) -> Vec<u8> {
 }
 
 pub fn unpadding(data: &[u8], len: usize) -> Result<Vec<u8>, ()> {
-    let data = [vec![0x00; len-data.len()], data.into()].concat();
-    if !data.starts_with(b"\x00\x02") { Err(())? };
+    let data = leftpad!(data.to_vec(), len, 0x00);
+    if data.len() != len || !data.starts_with(b"\x00\x02") { Err(())? };
     data[2..].iter()
         .position(|&n| n == 0x00)
         .map(|pos| data[pos+3..].into())

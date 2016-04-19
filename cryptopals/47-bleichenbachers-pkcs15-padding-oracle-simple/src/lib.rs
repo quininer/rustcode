@@ -4,6 +4,7 @@ extern crate num;
 extern crate implement_rsa;
 extern crate cbc_bitflipping_attacks;
 #[macro_use] extern crate implement_diffie_hellman;
+#[macro_use] extern crate the_cbc_padding_oracle;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 mod pkcs115;
@@ -22,19 +23,20 @@ pub type RsaArgs = (RSA, BigUint, BigUint);
 /// Plaintext M: lower, upper
 pub type M = (BigUint, BigUint);
 
-pub fn first_s(&(ref rsa, ref bb, ref c0): &RsaArgs, verify: &Verifyer) -> BigUint {
+
+pub fn first_s(&(ref rsa, ref bb, ref c): &RsaArgs, verify: &Verifyer) -> BigUint {
     let mut s = (&rsa.n + bb * THREE.clone() - ONE.clone()) / (bb * THREE.clone());
-    while !verify(&(c0 * modexp(&s, &rsa.e, &rsa.n) % &rsa.n).to_bytes_be()) {
+    while !verify(&(c * modexp(&s, &rsa.e, &rsa.n) % &rsa.n).to_bytes_be()) {
         s = s + ONE.clone();
     }
     s.clone()
 }
 
 pub fn next_s(
-    &(ref rsa, ref bb, ref c0): &RsaArgs,
+    &(ref rsa, ref bb, ref c): &RsaArgs,
     verify: &Verifyer,
-    &(ref a, ref b): &M,
-    s: &BigUint
+    s: &BigUint,
+    &(ref a, ref b): &M
 ) -> BigUint {
     let mut r = (TWO.clone() * (b * s - bb * TWO.clone()) + &rsa.n - ONE.clone()) / &rsa.n;
     loop {
@@ -42,7 +44,7 @@ pub fn next_s(
             (bb * TWO.clone() + &r * &rsa.n + b - ONE.clone()) / b,
             (bb * THREE.clone() + &r * &rsa.n + a - ONE.clone()) / a
         ) {
-            if verify(&(c0 * modexp(&s, &rsa.e, &rsa.n) % &rsa.n).to_bytes_be()) {
+            if verify(&(c * modexp(&s, &rsa.e, &rsa.n) % &rsa.n).to_bytes_be()) {
                 return s
             }
         };
@@ -52,8 +54,8 @@ pub fn next_s(
 
 pub fn next_interval(
     &(ref rsa, ref bb, _): &RsaArgs,
-    &(ref a, ref b): &M,
     s: &BigUint
+    &(ref a, ref b): &M,
 ) -> M {
     let r = (a * s - bb * THREE.clone() + &rsa.n) / &rsa.n;
     (
@@ -69,16 +71,17 @@ pub fn crack_rsa_padding_simple(rsa: &RSA, ciphertext: &[u8], verify: Verifyer) 
         pow(TWO.clone(), 8 * (k - 2)),
         BigUint::from_bytes_be(ciphertext)
     );
+
     let mut messages = (
         &rsa_args.1 * TWO.clone(),
         &rsa_args.1 * THREE.clone() - ONE.clone()
     );
     let mut s = first_s(&rsa_args, &verify);
-    messages = next_interval(&rsa_args, &messages, &s);
+    messages = next_interval(&rsa_args, &s, &messages);
 
     while &messages.0 != &messages.1 {
-        s = next_s(&rsa_args, &verify, &messages, &s);
-        messages = next_interval(&rsa_args, &messages, &s);
+        s = next_s(&rsa_args, &verify, &s, &messages);
+        messages = next_interval(&rsa_args, &s, &messages);
     }
 
     messages.0.to_bytes_be()
@@ -104,7 +107,10 @@ fn it_works() {
         unpadding(&crack_rsa_padding_simple(
             &rsa.clone(),
             &ciphertext,
-            Box::new(move |u| unpadding(&rsa.decrypt(u), len).is_ok())
+
+            // fast
+            // Box::new(move |u| unpadding(&rsa.decrypt(u), len).is_ok())
+            Box::new(move |u| rsa.decrypt(u).starts_with(b"\x02"))
         ), len).unwrap(),
         message
     );

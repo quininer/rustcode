@@ -9,6 +9,9 @@ path = "../39-implement-rsa"
 [dependencies.implement-diffie-hellman]
 path = "../33-implement-diffie-hellman"
 
+[dependencies.the-cbc-padding-oracle]
+path = "../17-the-cbc-padding-oracle"
+
 [dependencies.cbc-bitflipping-attacks]
 path = "../16-cbc-bitflipping-attacks"
 
