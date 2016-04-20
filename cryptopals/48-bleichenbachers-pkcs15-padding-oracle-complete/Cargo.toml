@@ -1,0 +1,22 @@
+[package]
+name = "bleichenbachers-pkcs15-padding-oracle-complete"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.bleichenbachers-pkcs15-padding-oracle-simple]
+path = "../47-bleichenbachers-pkcs15-padding-oracle-simple"
+
+[dependencies.implement-rsa]
+path = "../39-implement-rsa"
+
+[dependencies.implement-diffie-hellman]
+path = "../33-implement-diffie-hellman"
+
+[dependencies.cbc-bitflipping-attacks]
+path = "../16-cbc-bitflipping-attacks"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]
+num = "*"

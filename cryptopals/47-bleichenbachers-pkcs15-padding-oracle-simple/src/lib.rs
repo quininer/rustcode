@@ -24,8 +24,15 @@ pub type RsaArgs = (RSA, BigUint, BigUint);
 pub type M = (BigUint, BigUint);
 
 
-pub fn first_s(&(ref rsa, ref bb, ref c): &RsaArgs, verify: &Verifyer) -> BigUint {
-    let mut s = (&rsa.n + bb * THREE.clone() - ONE.clone()) / (bb * THREE.clone());
+pub fn first_s(
+    &(ref rsa, ref bb, ref c): &RsaArgs,
+    verify: &Verifyer,
+    s: Option<BigUint>
+) -> BigUint {
+    let mut s = match s {
+        Some(s) => s + ONE.clone(),
+        None => (&rsa.n + bb * THREE.clone() - ONE.clone()) / (bb * THREE.clone())
+    };
     while !verify(&(c * modexp(&s, &rsa.e, &rsa.n) % &rsa.n).to_bytes_be()) {
         s = s + ONE.clone();
     }
@@ -54,7 +61,7 @@ pub fn next_s(
 
 pub fn next_interval(
     &(ref rsa, ref bb, _): &RsaArgs,
-    s: &BigUint
+    s: &BigUint,
     &(ref a, ref b): &M,
 ) -> M {
     let r = (a * s - bb * THREE.clone() + &rsa.n) / &rsa.n;
@@ -72,19 +79,19 @@ pub fn crack_rsa_padding_simple(rsa: &RSA, ciphertext: &[u8], verify: Verifyer) 
         BigUint::from_bytes_be(ciphertext)
     );
 
-    let mut messages = (
+    let mut m = (
         &rsa_args.1 * TWO.clone(),
         &rsa_args.1 * THREE.clone() - ONE.clone()
     );
-    let mut s = first_s(&rsa_args, &verify);
-    messages = next_interval(&rsa_args, &s, &messages);
+    let mut s = first_s(&rsa_args, &verify, None);
+    m = next_interval(&rsa_args, &s, &m);
 
-    while &messages.0 != &messages.1 {
-        s = next_s(&rsa_args, &verify, &s, &messages);
-        messages = next_interval(&rsa_args, &s, &messages);
+    while &m.0 != &m.1 {
+        s = next_s(&rsa_args, &verify, &s, &m);
+        m = next_interval(&rsa_args, &s, &m);
     }
 
-    messages.0.to_bytes_be()
+    m.0.to_bytes_be()
 }
 
 
