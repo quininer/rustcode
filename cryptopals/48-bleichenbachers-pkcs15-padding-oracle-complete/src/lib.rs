@@ -83,8 +83,7 @@ fn it_works() {
         unpadding(&crack_rsa_padding_complete(
             &rsa.clone(),
             &ciphertext,
-            Box::new(move |u| rsa.decrypt(u).starts_with(b"\x02"))
-            // Box::new(move |u| unpadding(&rsa.decrypt(u), len).is_ok())
+            Box::new(move |u| unpadding(&rsa.decrypt(u), len).is_ok())
         ), len).unwrap(),
         message
     );

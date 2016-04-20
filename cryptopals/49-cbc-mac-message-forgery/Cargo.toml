@@ -1,0 +1,22 @@
+[package]
+name = "cbc-mac-message-forgery"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies.implement-pkcs7-padding]
+path = "../9-implement-pkcs7-padding"
+
+[dependencies.implement-cbc-mode]
+path = "../10-implement-cbc-mode"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies.ecb-cut-and-paste]
+path = "../13-ecb-cut-and-paste"
+
+[dependencies]
+maplit = "*"
