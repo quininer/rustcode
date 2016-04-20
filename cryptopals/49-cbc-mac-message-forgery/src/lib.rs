@@ -78,7 +78,7 @@ impl BankServer {
             "from={}&tx_list=",
             from.replace('&', "%26").replace('=', "%3d").replace(':', "%3a").replace(';', "%3b")
         );
-        for (to, amount) in toamount.iter() {
+        for (to, amount) in &toamount {
             message.push_str(&format!(
                 "{}:{};",
                 to.replace('&', "%26").replace('=', "%3d").replace(':', "%3a").replace(';', "%3b"),

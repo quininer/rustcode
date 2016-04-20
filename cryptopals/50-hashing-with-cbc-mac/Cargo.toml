@@ -1,0 +1,16 @@
+[package]
+name = "hashing-with-cbc-mac"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.cbc-mac-message-forgery]
+path = "../49-cbc-mac-message-forgery"
+
+[dependencies.implement-pkcs7-padding]
+path = "../9-implement-pkcs7-padding"
+
+[dependencies.fixed-xor]
+path = "../2-fixed-xor"
+
+[dependencies]
+rustc-serialize = "*"
