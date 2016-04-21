@@ -24,7 +24,7 @@ impl AesCBC {
 
     pub fn update(&mut self, mode: Mode, data: &[u8]) -> Vec<u8> {
         let crypter = Crypter::new(Type::AES_128_ECB);
-        crypter.init(mode, &self.key, &Vec::new());
+        crypter.init(mode, &self.key, &[]);
         crypter.pad(false);
         data.chunks(self.key.len())
             .map(|u| match mode {

@@ -18,9 +18,14 @@ pub use http::{ hmac_app, INTERVAL };
 
 
 pub fn rightpad(data: &[u8], len: usize) -> Vec<u8> {
+    let len = match (data.len(), data.len() % len) {
+        (0, 0) => len,
+        (_, 0) => 0,
+        (_, n) => len - n
+    };
     [
         data.into(),
-        vec![0; len-data.len()]
+        vec![0; len]
     ].concat()
 }
 
