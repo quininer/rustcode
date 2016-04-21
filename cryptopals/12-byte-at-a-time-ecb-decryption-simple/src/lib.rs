@@ -73,13 +73,13 @@ pub fn crack_ecb_nextbyte((offset, i): (usize, usize), bs: usize, known: &[u8], 
     if paddinged.len() <= pbs {
         return None;
     }
-    (0..std::u8::MAX as usize + 1).find(
-        |u| &paddinged[offset..pbs] == &encryptor(&[
+    (0..std::u8::MAX as usize + 1).map(|r| r as u8).find(
+        |&u| &paddinged[offset..pbs] == &encryptor(&[
             padding.as_ref(),
             known,
-            &[*u as u8]
+            &[u]
         ].concat())[offset..pbs]
-    ).map(|r| r as u8)
+    )
 }
 
 pub fn crack_ecb_plaintext(offset: (usize, usize), bs: usize, encryptor: Encryptor) -> Vec<u8> {
