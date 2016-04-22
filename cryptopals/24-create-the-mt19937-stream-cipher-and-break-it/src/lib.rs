@@ -57,18 +57,20 @@ fn test_crack_mt_mtream_cipher() {
         known_plaintext.to_vec()
     ].concat());
 
-    let guess_key = (0..std::u16::MAX as usize + 1).find(|&k|
-        MT19937::new(k as u32)
-            .take(ciphertext.len())
-            .skip(ciphertext.len() - known_plaintext.len())
-            .zip(known_plaintext.iter())
-            .map(|(k, p)| k as u8 ^ p)
-            .collect::<Vec<_>>()
-        ==
-        &ciphertext[ciphertext.len() - known_plaintext.len()..]
-    ).map(|r| r as u16);
+    let guess_key = (0..std::u16::MAX as usize + 1)
+        .map(|r| r as u16)
+        .find(|&k|
+            MT19937::new(k as u32)
+                .take(ciphertext.len())
+                .skip(ciphertext.len() - known_plaintext.len())
+                .zip(known_plaintext.iter())
+                .map(|(k, p)| k as u8 ^ p)
+                .collect::<Vec<_>>()
+            ==
+            &ciphertext[ciphertext.len() - known_plaintext.len()..]
+        );
 
-    assert_eq!(Some(key), guess_key);
+    assert_eq!(guess_key, Some(key));
 }
 
 #[test]

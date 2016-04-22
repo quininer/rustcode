@@ -5,7 +5,6 @@ extern crate implement_pkcs7_padding;
 extern crate ecb_cut_and_paste;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 #[macro_use] extern crate fixed_xor;
-#[macro_use] extern crate maplit;
 
 use std::collections::HashMap;
 use implement_cbc_mode::{ AesCBC, Mode };
@@ -73,12 +72,12 @@ impl BankServer {
         }
     }
 
-    fn inner_remittance_api(&self, from: &str, toamount: HashMap<String, usize>) -> Vec<u8> {
+    fn inner_remittance_api(&self, from: &str, toamount: Vec<(String, usize)>) -> Vec<u8> {
         let mut message = format!(
             "from={}&tx_list=",
             from.replace('&', "%26").replace('=', "%3d").replace(':', "%3a").replace(';', "%3b")
         );
-        for (to, amount) in &toamount {
+        for &(ref to, ref amount) in &toamount {
             message.push_str(&format!(
                 "{}:{};",
                 to.replace('&', "%26").replace('=', "%3d").replace(':', "%3a").replace(';', "%3b"),
@@ -90,13 +89,13 @@ impl BankServer {
         [message, mac].concat()
     }
 
-    pub fn new_remittance_api(&self, from: &str, toamount: HashMap<String, usize>) -> Result<Vec<u8>, ()> {
+    pub fn new_remittance_api(&self, from: &str, toamount: Vec<(String, usize)>) -> Result<Vec<u8>, ()> {
         if from != "charlie" && from != "cc" { Err(())? };
         Ok(self.inner_remittance_api(from, toamount))
     }
 
     pub fn bob_remittance_api(&self) -> Vec<u8> {
-        self.inner_remittance_api("bob", hashmap!{ String::from("alice") => 1 })
+        self.inner_remittance_api("bob", vec![(String::from("alice"), 1)])
     }
 }
 
@@ -134,10 +133,10 @@ fn test_forgery_with_noiv() {
     let data = bank.bob_remittance_api();
     let (message, mac) = data.split_at(data.len()-16);
 
-    let charlie_data = bank.new_remittance_api("cc", hashmap!{
-        String::from("aa") => 1,
-        String::from("alice") => 1000000
-    }).unwrap();
+    let charlie_data = bank.new_remittance_api("cc", vec![
+        (String::from("charlie"), 1),
+        (String::from("alice"), 1000000)
+    ]).unwrap();
     let (from, tx_list) = bank.new_verify_api(&[
         pkcs7padding(&message, 16),
         xor!(mac, &charlie_data[..16]),
@@ -157,11 +156,11 @@ fn test_bank() {
     assert_eq!(info["to"], "alice");
     assert_eq!(info["amount"], String::from("1"));
 
-    let data = bank.new_remittance_api("charlie", hashmap!{ String::from("alice") => 1 }).unwrap();
+    let data = bank.new_remittance_api("charlie", vec![(String::from("alice"), 1)]).unwrap();
     let (from, tx_list) = bank.new_verify_api(&data).unwrap();
     assert_eq!(from, "charlie");
     assert_eq!(tx_list["alice"], 1);
 
     assert!(bank.remittance_api("bob", "alice", 1).is_err());
-    assert!(bank.new_remittance_api("bob", hashmap!{ String::from("alice") => 1 }).is_err());
+    assert!(bank.new_remittance_api("bob", vec![(String::from("alice"), 1)]).is_err());
 }

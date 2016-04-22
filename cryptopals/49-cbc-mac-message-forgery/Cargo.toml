@@ -19,4 +19,3 @@ path = "../11-an-ebccbc-detection-oracle"
 path = "../13-ecb-cut-and-paste"
 
 [dependencies]
-maplit = "*"

@@ -3,6 +3,9 @@ name = "iterated-hash-function-multicollisions"
 version = "0.1.0"
 authors = ["quininer kel <quininer@live.com>"]
 
+[dependencies.implement-diffie-hellman]
+path = "../33-implement-diffie-hellman"
+
 [dependencies.implement-and-break-hmac-sha1-with-an-artificial-timing-leak]
 path = "../31-implement-and-break-hmac-sha1-with-an-artificial-timing-leak"
 

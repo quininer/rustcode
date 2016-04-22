@@ -1,16 +1,18 @@
 extern crate num;
 extern crate openssl;
+extern crate implement_diffie_hellman;
 extern crate implement_and_break_hmac_sha1_with_an_artificial_timing_leak;
 #[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use std::collections::HashMap;
-use num::BigUint;
+use num::{ pow, range };
 use openssl::crypto::symm::{ Crypter, Type, Mode };
 use implement_and_break_hmac_sha1_with_an_artificial_timing_leak::rightpad;
+use implement_diffie_hellman::{ ZERO, TWO };
 
 
-pub const H: usize = 4;
-pub type CompressFn = Box<Fn(&[u8], &[u8]) -> Vec<u8>>;
+pub const H: usize = 8;
+pub type HashFn = Box<Fn(&[u8], &[u8]) -> Vec<u8>>;
 
 pub fn aes_hash(data: &[u8], state: &[u8]) -> Vec<u8> {
     let aes = Crypter::new(Type::AES_128_ECB);
@@ -34,7 +36,8 @@ pub fn md_aes(message: &[u8], is: &[u8]) -> Vec<u8> {
     is
 }
 
-pub fn crack_md_preimage_collide(message: &[u8], prefix: &[u8], md: CompressFn) -> Result<Vec<u8>, ()> {
+/*
+pub fn crack_md_preimage_collide(message: &[u8], prefix: &[u8], md: HashFn) -> Result<Vec<u8>, ()> {
     let message = padding(message);
     let prefix = padding(prefix);
     let state = md(&prefix, &[]);
@@ -63,8 +66,22 @@ pub fn crack_md_preimage_collide(message: &[u8], prefix: &[u8], md: CompressFn) 
         None => Err(())
     }
 }
+*/
 
+pub fn gen_collide(h: usize, md: HashFn, is1: &[u8], is2: &[u8]) -> Result<(Vec<u8>, Vec<u8>), ()> {
+    let mut collisions: HashMap<Vec<u8>,Vec<u8>> = HashMap::new();
+    for b in range(ZERO.clone(), pow(TWO.clone(), h * 8)) {
+        let b = b.to_bytes_be();
+        if let Some(a) = collisions.get(&md(&b, is2)) {
+            return Ok((a.clone(), b));
+        }
 
+        collisions.insert(md(&b, is1), b);
+    }
+    Err(())
+}
+
+/*
 #[test]
 fn test_preimage() {
     let message = rand!(H * 10);
@@ -80,25 +97,12 @@ fn test_preimage() {
         md_aes(&fake_message, &[])
     );
 }
+*/
 
 #[test]
 fn it_works() {
-    let mut collisions = HashMap::new();
-    let mut x = "hello world.".into();
-    let mut y = "hello world!".into();
-    for b in (0..2usize.pow(H as u32 * 8))
-        .map(BigUint::from)
-        .map(|n| n.to_bytes_be())
-    {
-        match collisions.insert(md_aes(&b, &[]), b.clone()) {
-            Some(out) => {
-                x = out;
-                y = b;
-                break
-            },
-            None => ()
-        };
-    }
+    let (x, y) = gen_collide(H, Box::new(md_aes), &[], &[]).unwrap();
+    assert!(x != y);
     assert_eq!(
         md_aes(&x, &[]),
         md_aes(&y, &[])
