@@ -34,11 +34,9 @@ impl Signer for RSA {
         self.decrypt(&padding(&Sha1::hash(data)))
     }
     fn verify(&self, data: &[u8], signature: &[u8]) -> bool {
-        let block = self.encrypt(signature);
+        let block = [vec![0x00], self.encrypt(signature)].concat();
 
-        // XXX because bytes to bituint missing leading zero.
-        // r"\x00\x01\xff+?\x00(.{20})"
-        Regex::new(r"\x01\xff+?\x00([\x00-\xff]{20})").unwrap()
+        Regex::new(r"\x00\x01\xff+?\x00([\x00-\xff]{20})").unwrap()
             .captures(&block)
             .and_then(|matches| matches.at(1))
             .map_or(false, |matches| Sha1::hash(data) == matches)

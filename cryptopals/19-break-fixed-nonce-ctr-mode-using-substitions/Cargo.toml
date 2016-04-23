@@ -6,9 +6,6 @@ authors = ["quininer kel <quininer@live.com>"]
 [dependencies.implement-ctr-the-stream-cipher-mode]
 path = "../18-implement-ctr-the-stream-cipher-mode"
 
-[dependencies.an-ebccbc-detection-oracle]
-path = "../11-an-ebccbc-detection-oracle"
-
 [dependencies.break-repeating-key-xor]
 path = "../6-break-repeating-key-xor"
 

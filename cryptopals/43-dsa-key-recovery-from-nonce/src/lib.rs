@@ -59,8 +59,7 @@ bb283e6633451e535c45513b2d33c99ea17");
         y: y.clone()
     };
 
-    // XXX 0..2^16
-    let k = (16574..(2u32.pow(16)+1)).find(|&k| recover_dsa_from_k(
+    let k = (0..(2u32.pow(16)+1)).find(|&k| recover_dsa_from_k(
         &dsa,
         &r,
         &s,

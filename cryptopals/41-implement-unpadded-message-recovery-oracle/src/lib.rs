@@ -7,7 +7,7 @@ extern crate cbc_bitflipping_attacks;
 use std::collections::HashSet;
 use num::BigUint;
 use cbc_bitflipping_attacks::Cipher;
-use implement_diffie_hellman::{ modexp, ONE };
+use implement_diffie_hellman::{ modexp, TWO };
 use implement_rsa::{ RSA, uinvmod };
 
 
@@ -48,7 +48,7 @@ impl RsaOracle {
 }
 
 pub fn crack_rsa_with_decryptor(rsa: &RSA, ciphertext: &[u8], mut decryptor: Decryptor) -> Vec<u8> {
-    let s = rand_big!(&(ONE.clone() + ONE.clone()), &rsa.n);
+    let s = rand_big!(&TWO, &rsa.n);
     let cc = (
         modexp(&s, &rsa.e, &rsa.n)
             * BigUint::from_bytes_be(ciphertext)
@@ -63,13 +63,12 @@ pub fn crack_rsa_with_decryptor(rsa: &RSA, ciphertext: &[u8], mut decryptor: Dec
 fn it_works() {
     let text = rand!(16);
     let mut oracle = RsaOracle::new();
-    let rsa = oracle.public();
     let ciphertext = oracle.encrypt(&text);
     assert_eq!(oracle.decrypt(&ciphertext), Some(text.clone()));
     assert!(oracle.decrypt(&ciphertext).is_none());
     assert_eq!(
         crack_rsa_with_decryptor(
-            &rsa,
+            &oracle.public(),
             &ciphertext,
             Box::new(move |u| oracle.decrypt(u).unwrap())
         ),

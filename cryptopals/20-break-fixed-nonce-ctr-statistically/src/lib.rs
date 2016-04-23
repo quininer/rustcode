@@ -3,7 +3,6 @@ extern crate implement_ctr_the_stream_cipher_mode;
 extern crate break_repeating_key_xor;
 extern crate break_fixed_nonce_ctr_mode_using_substitions;
 #[macro_use] extern crate fixed_xor;
-#[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use fixed_xor::xor_by;
 use break_repeating_key_xor::zip;
@@ -48,9 +47,7 @@ fn it_works() {
         .map(|r| r.from_base64().unwrap())
         .collect::<Vec<Vec<u8>>>();
 
-    // FIXME
-    // let crypter = AesCTR::from(&[0; 16], &[0; 8]);
-    let crypter = AesCTR::new(&rand!());
+    let crypter = AesCTR::from(b"YELLOW SUBMARINE", &[0; 8]);
     let ciphertexts = inputs.iter()
         .map(|r| crypter.clone().set_ctr(0).update(r))
         .collect::<Vec<Vec<u8>>>();

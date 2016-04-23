@@ -3,7 +3,6 @@ extern crate implement_ctr_the_stream_cipher_mode;
 extern crate break_repeating_key_xor;
 extern crate single_byte_xor_cipher;
 #[macro_use] extern crate fixed_xor;
-#[macro_use] extern crate an_ebccbc_detection_oracle;
 
 
 pub fn tailor_stram(data: &[Vec<u8>]) -> (usize, Vec<Vec<u8>>) {
@@ -27,7 +26,7 @@ fn it_works() {
         .map(|r| r.from_base64().unwrap())
         .collect::<Vec<Vec<u8>>>();
 
-    let crypter = AesCTR::new(&rand!());
+    let crypter = AesCTR::from(b"YELLOW SUBMARINE", &[0; 8]);
     let ciphertexts = inputs.iter()
         .map(|r| crypter.clone().set_ctr(0).update(r))
         .collect::<Vec<Vec<u8>>>();
