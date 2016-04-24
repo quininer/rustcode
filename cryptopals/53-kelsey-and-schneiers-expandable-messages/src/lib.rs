@@ -34,7 +34,8 @@ pub fn make_expandable(k: usize, is: &[u8], md: &HashFn) -> (Vec<u8>, Vec<(Vec<u
     let mut is: Vec<u8> = is.into();
 
     for i in 1..(k+1) {
-        let (xis, message, dummy) = state_collision(2usize.pow((k-i) as u32), &is, md).unwrap();
+        let (xis, message, dummy) =
+            state_collision(2usize.pow((k-i) as u32), &is, md).unwrap();
         is = xis;
         expandable.push((message, dummy));
     }
@@ -80,8 +81,9 @@ pub fn crack_md_preimage(k: usize, message: &[u8], md: HashFn) -> Vec<u8> {
 
     let (bridge, pos) = range(ZERO.clone(), pow(TWO.clone(), B))
         .map(|n| rightpad(&n.to_bytes_le(), B))
-        .find(|b| hash_chunks.get(&md(&b, &fs)).is_some())
-        .map(|b| (b.clone(), *hash_chunks.get(&md(&b, &fs)).unwrap()))
+        .map(|b| (b.clone(), hash_chunks.get(&md(&b, &fs))))
+        .find(|&(_, h)| h.is_some())
+        .map(|(b, h)| (b, *h.unwrap()))
         .unwrap();
 
     [

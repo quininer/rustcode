@@ -94,6 +94,13 @@ fn it_works() {
         ].concat()))
     );
     assert_eq!(guess_secret, SESSION_ID.as_bytes());
+
+    let guess_host = guess_compress_secret(
+        b"Host: ",
+        b"abcdefghijklmnopqrstuvwxyz1234567890@%:.?",
+        Box::new(|u, _| compression_oracle_with_ctr(&[u; 8].concat()))
+    );
+    assert_eq!(guess_host, b"hapless.com");
 }
 
 #[test]
