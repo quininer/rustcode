@@ -4,13 +4,11 @@ extern crate num;
 extern crate implement_diffie_hellman;
 extern crate implement_and_break_hmac_sha1_with_an_artificial_timing_leak;
 extern crate iterated_hash_function_multicollisions;
-extern crate kelsey_and_schneiers_expandable_messages;
-#[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use std::collections::HashMap;
-use num::{ BigUint, range, pow };
+use num::{ range, pow };
 use implement_and_break_hmac_sha1_with_an_artificial_timing_leak::rightpad;
-use implement_diffie_hellman::{ ZERO, TWO };
+use implement_diffie_hellman::{ ZERO, ONE, TWO };
 use iterated_hash_function_multicollisions::{ HashFn, B };
 
 
@@ -33,7 +31,7 @@ pub fn pair_collisions(is1: &[u8], is2: &[u8], md: &HashFn) -> Result<((Vec<u8>,
     Err(())
 }
 
-pub fn gen_predicted_hash(k: usize, len: usize, md: HashFn) -> (Vec<u8>, CollectionTree) {
+pub fn gen_predicted_hash(k: usize, md: HashFn) -> (Vec<u8>, CollectionTree) {
     let leaves: Vec<(Vec<u8>, Vec<u8>)> = range(ZERO.clone(), pow(TWO.clone(), k))
         .map(|n| rightpad(&n.to_bytes_le(), B))
         .map(|u| (u.clone(), md(&u, &[])))
@@ -65,28 +63,36 @@ pub fn gen_predicted_hash(k: usize, len: usize, md: HashFn) -> (Vec<u8>, Collect
         previous_level = next_level.clone();
     }
 
-    let hash = md(
-        &rightpad(&BigUint::from(len).to_bytes_le(), B),
-        &tree[tree.len()-1][0].1
-    );
-
-    (hash, tree)
+    (tree[tree.len()-1][0].1.clone(), tree)
 }
 
 pub fn forge_predicted_message(message: &[u8], len: usize, tree: &CollectionTree, md: HashFn) -> Vec<u8> {
     let message = rightpad(message, B);
+    assert!(message.len() < len);
+
     let leaves: HashMap<Vec<u8>, usize> = tree.iter()
         .map(|r| r[0].clone())
         .enumerate()
         .map(|(i, l)| (l.1, i))
         .collect();
-    let (leaf_index, mut message) = range(ZERO.clone(), pow(TWO.clone(), B))
+
+    let glue_len = len - message.len() - B * (tree.len() - 1);
+    assert!(glue_len > 0);
+
+    let (leaf_index, mut message) = range(
+        pow(TWO.clone(), glue_len * 8 - 1),
+        pow(TWO.clone(), glue_len * 8) - ONE.clone()
+    )
+        .rev()
         .map(|n| rightpad(&n.to_bytes_le(), B))
         .map(|u| [message.clone(), u].concat())
         .map(|b| (leaves.get(&md(&b, &[])), b))
         .find(|&(i, _)| i.is_some())
         .map(|(i, b)| (*i.unwrap(), b))
         .unwrap();
+
+    assert_eq!(md(&message, &[]), tree[0][leaf_index].1);
+
     for i in 1..tree.len() {
         let leaf = tree[i][leaf_index / 2usize.pow(i as u32)].0.clone();
         let index = leaf_index / 2usize.pow(i as u32 - 1) % 2;
@@ -98,8 +104,7 @@ pub fn forge_predicted_message(message: &[u8], len: usize, tree: &CollectionTree
         });
     };
 
-    assert_eq!(message.len() % B, 0);
-    [message, rightpad(&BigUint::from(len).to_bytes_le(), B)].concat()
+    message
 }
 
 
@@ -108,14 +113,12 @@ fn it_works() {
     use iterated_hash_function_multicollisions::md_aes;
 
     let k = 4;
-    let length = 100;
+    let len = 128;
     let message = b"winner is china football.";
-    let (hash, tree) = gen_predicted_hash(k, length, Box::new(md_aes));
-    let forge_message = forge_predicted_message(message, length, &tree, Box::new(md_aes));
+    let (hash, tree) = gen_predicted_hash(k, Box::new(md_aes));
+    let forge_message = forge_predicted_message(message, len, &tree, Box::new(md_aes));
 
     assert!(forge_message.starts_with(message));
-    assert_eq!(
-        hash,
-        md_aes(&forge_message, &[])
-    );
+    assert_eq!(forge_message.len(), len);
+    assert_eq!(md_aes(&forge_message, &[]), hash);
 }
