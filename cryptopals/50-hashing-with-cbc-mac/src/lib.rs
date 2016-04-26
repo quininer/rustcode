@@ -12,11 +12,9 @@ pub fn aescbc_hash(data: &[u8]) -> Vec<u8> {
 }
 
 pub fn crack_aescbchash_collide(content: &[u8], fake_content: &[u8]) -> Vec<u8> {
-    let hash = aescbc_hash(fake_content);
-    let fake_content_pad = pkcs7padding(fake_content, 16);
     [
-        fake_content_pad,
-        xor!(content[..16].into(), hash),
+        pkcs7padding(fake_content, 16),
+        xor!(content[..16].into(), aescbc_hash(fake_content)),
         content[16..].into()
     ].concat()
 }

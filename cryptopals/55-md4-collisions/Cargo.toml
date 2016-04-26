@@ -1,0 +1,16 @@
+[package]
+name = "md4-collisions"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.break-an-md4keyed-mac-using-length-extension]
+path = "../30-break-an-md4keyed-mac-using-length-extension"
+
+[dependencies.implement-a-sha-1-keyed-mac]
+path = "../28-implement-a-sha-1-keyed-mac"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]
+byteorder = "*"

@@ -110,15 +110,13 @@ fn test_forgery_with_iv() {
     let iv = &data[data.len()-32..data.len()-16];
     let mac = &data[data.len()-16..];
 
-    let new_iv = xor!(
-        &forgery_message[..16],
-        &message[..16],
-        iv
-    );
-
     let info = bank.verify_api(&[
         forgery_message.to_vec(),
-        new_iv,
+        xor!(
+            &forgery_message[..16],
+            &message[..16],
+            iv
+        ),
         mac.into()
     ].concat()).unwrap();
     assert_eq!(info["from"], "bob");

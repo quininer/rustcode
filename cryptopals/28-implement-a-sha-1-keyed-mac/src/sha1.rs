@@ -57,10 +57,10 @@ impl Sha1 {
         let &mut Sha1(mut a, mut b, mut c, mut d, mut e) = self;
         for (i, &n) in words.iter().enumerate() {
             let (k, f) = match i {
-                0...19 => (0x5A827999, (b & c) | (!b & d)),
-                20...39 => (0x6ED9EBA1, b ^ c ^ d),
-                40...59 => (0x8F1BBCDC, (b & c) | (b & d) | (c & d)),
-                60...79 => (0xCA62C1D6, b ^ c ^ d),
+                0...19 => (0x5A827999, f(b, c, d)),
+                20...39 => (0x6ED9EBA1, h(b, c, d)),
+                40...59 => (0x8F1BBCDC, g(b, c, d)),
+                60...79 => (0xCA62C1D6, h(b, c, d)),
                 _ => unreachable!()
             };
             let temp = a
@@ -100,6 +100,10 @@ impl Sha1 {
         Ok(out)
     }
 }
+
+pub fn f(b: u32, c: u32, d: u32) -> u32 { (b & c) | (!b & d) }
+pub fn g(b: u32, c: u32, d: u32) -> u32 { (b & c) | (b & d) | (c & d) }
+pub fn h(b: u32, c: u32, d: u32) -> u32 { b ^ c ^ d }
 
 pub trait Digest: Hasher {
     fn bs() -> usize;

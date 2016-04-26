@@ -9,7 +9,11 @@ mod md4;
 use std::io;
 use byteorder::LittleEndian;
 use implement_a_sha_1_keyed_mac::{ concat_mac, Digest, padding };
-pub use md4::MD4;
+pub use md4::{
+    MD4, H0, H1, H2, H3,
+    round_1, round_2, round_3,
+    le_to_bytes
+};
 
 
 pub fn md4_mac(key: &[u8], message: &[u8]) -> Vec<u8> {

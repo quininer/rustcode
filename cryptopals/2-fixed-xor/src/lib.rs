@@ -11,9 +11,7 @@ macro_rules! xor {
         $( list.push($bytes); )*
         list.iter().fold(
             vec![0; list[0].len()],
-            |out, next|
-                $crate::xor(&out, &next[..out.len()])
-                    .unwrap()
+            |out, next| $crate::xor(&out, &next[..out.len()]).unwrap()
         )
     }}
 }

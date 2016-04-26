@@ -41,7 +41,8 @@ pub fn compression_oracle_with_ctr(p: &[u8]) -> usize {
 
 pub fn format_request(p: &[u8]) -> Vec<u8> {
     let header = format!(
-"POST / HTTP/1.1
+"\
+POST / HTTP/1.1
 Host: hapless.com
 Cookie: sessionid={}
 Content-Length: {}
@@ -97,7 +98,7 @@ fn it_works() {
 
     let guess_host = guess_compress_secret(
         b"Host: ",
-        b"abcdefghijklmnopqrstuvwxyz1234567890@%:.?",
+        b"abcdefghijklmnopqrstuvwxyz1234567890@%&=:./?",
         Box::new(|u, _| compression_oracle_with_ctr(&[u; 8].concat()))
     );
     assert_eq!(guess_host, b"hapless.com");

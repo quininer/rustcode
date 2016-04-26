@@ -6,7 +6,7 @@ extern crate byteorder;
 mod sha1;
 
 pub use byteorder::{ BigEndian, LittleEndian };
-pub use sha1::{ Sha1, Digest, padding };
+pub use sha1::{ Sha1, Digest, padding, f, g, h };
 
 
 pub fn concat_mac<H: Digest>(key: &[u8], message: &[u8]) -> Vec<u8> {

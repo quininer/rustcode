@@ -1,14 +1,20 @@
 use std::io;
 use std::hash::Hasher;
 use byteorder::{ LittleEndian, WriteBytesExt, ReadBytesExt };
-use implement_a_sha_1_keyed_mac::{ padding, Digest };
+use implement_a_sha_1_keyed_mac::{ padding, Digest, f, g, h };
 
 
+pub const H0: u32 = 0x67452301;
+pub const H1: u32 = 0xEFCDAB89;
+pub const H2: u32 = 0x98BADCFE;
+pub const H3: u32 = 0x10325476;
+
+#[derive(Clone, Debug)]
 pub struct MD4(u32, u32, u32, u32);
 
 impl Default for MD4 {
     fn default() -> MD4 {
-        MD4(0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476)
+        MD4(H0, H1, H2, H3)
     }
 }
 
@@ -29,7 +35,7 @@ impl MD4 {
     pub fn process(&mut self, mut block: &[u8]) {
         assert_eq!(block.len(), 64);
 
-        let mut data = Vec::new();
+        let mut data = Vec::with_capacity(16);
         loop {
             data.push(match block.read_u32::<LittleEndian>() {
                 Ok(v) => v,
@@ -102,27 +108,35 @@ impl Digest for MD4 {
     }
 }
 
-fn round_1(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
+pub fn round_1(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
     a
-        .wrapping_add((b & c) | (!b & d))
+        .wrapping_add(f(b, c, d))
         .wrapping_add(x)
         .rotate_left(s)
 }
 
-fn round_2(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
+pub fn round_2(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
     a
-        .wrapping_add((b & c) | (b & d) | (c & d))
+        .wrapping_add(g(b, c, d))
         .wrapping_add(x)
-        .wrapping_add(0x5a827999)
+        .wrapping_add(0x5A827999)
         .rotate_left(s)
 }
 
-fn round_3(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
+pub fn round_3(a: u32, b: u32, c: u32, d: u32, x: u32, s: u32) -> u32 {
     a
-        .wrapping_add(b ^ c ^ d)
+        .wrapping_add(h(b, c, d))
         .wrapping_add(x)
         .wrapping_add(0x6ED9EBA1)
         .rotate_left(s)
+}
+
+pub fn le_to_bytes(input: &[u32]) -> Vec<u8> {
+    let mut out = Vec::new();
+    for &b in input {
+        out.write_u32::<LittleEndian>(b).ok();
+    }
+    out
 }
 
 
@@ -141,5 +155,20 @@ fn test_md4() {
     assert_eq!(
         MD4::hash(b"The quick brown fox jumps over the lazy cog"),
         "b86e130ce7028da59e672d56ad0113df".from_hex().unwrap()
+    );
+
+    assert_eq!(
+        MD4::hash(&le_to_bytes(&[
+            0x4147aa31, 0xaf69056f, 0xdaaad646, 0x86e1f0e1,
+            0x2906a664, 0x7a7c6805, 0xc674227a, 0x40f16ac8,
+            0x6cc2c727, 0xb9fd2264, 0x263b9124, 0x3f12b477,
+            0x2027f524, 0xbbef611c, 0x1f3a828d, 0xfdf2ac75
+        ])),
+        MD4::hash(&le_to_bytes(&[
+            0x4147aa31, 0x2f69056f, 0x4aaad646, 0x86e1f0e1,
+            0x2906a664, 0x7a7c6805, 0xc674227a, 0x40f16ac8,
+            0x6cc2c727, 0xb9fd2264, 0x263b9124, 0x3f12b477,
+            0x2026f524, 0xbbef611c, 0x1f3a828d, 0xfdf2ac75
+        ]))
     );
 }
