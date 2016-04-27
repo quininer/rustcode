@@ -1,0 +1,13 @@
+[package]
+name = "rc4-single-byte-biases"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[dependencies.implement-ctr-the-stream-cipher-mode]
+path = "../18-implement-ctr-the-stream-cipher-mode"
+
+[dependencies.an-ebccbc-detection-oracle]
+path = "../11-an-ebccbc-detection-oracle"
+
+[dependencies]
+rustc-serialize = "*"

@@ -32,6 +32,15 @@ pub trait StreamCipher {
     fn update(&mut self, data: &[u8]) -> Vec<u8>;
 }
 
+impl<T> StreamCipher for T where T: Iterator<Item=u8> {
+    fn update(&mut self, data: &[u8]) -> Vec<u8> {
+        data.iter()
+            .zip(self.take(data.len()))
+            .map(|(u, c)| u ^ c)
+            .collect()
+    }
+}
+
 impl StreamCipher for AesCTR {
     fn update(&mut self, data: &[u8]) -> Vec<u8> {
         let crypter = Crypter::new(Type::AES_128_ECB);

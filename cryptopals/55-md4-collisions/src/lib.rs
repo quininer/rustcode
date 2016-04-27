@@ -1,7 +1,6 @@
 extern crate byteorder;
 extern crate break_an_md4keyed_mac_using_length_extension;
 extern crate implement_a_sha_1_keyed_mac;
-#[macro_use] extern crate an_ebccbc_detection_oracle;
 
 use byteorder::{ LittleEndian, ReadBytesExt };
 use implement_a_sha_1_keyed_mac::{ f, g, h };
