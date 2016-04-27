@@ -31,7 +31,7 @@ pub fn crack_rc4_cookie(oracle: Rc4Oracle) -> Vec<u8> {
     let cookie_len = oracle(&[]).len();
     assert_eq!(cookie_len, 30);
     let mut counts: Vec<Vec<usize>> = (0..cookie_len).map(|_| vec![0; 256]).collect();
-    let mut prefix = vec![b'A'; 2];
+    let mut prefix = vec![0; 2];
 
     while prefix.len() < 18 {
         let pl = prefix.len();
@@ -55,7 +55,7 @@ pub fn crack_rc4_cookie(oracle: Rc4Oracle) -> Vec<u8> {
             "{}\n",
             to_visible(&recover_rc4_cookie(&counts))
         )).ok();
-        prefix.push(b'A');
+        prefix.push(0x00);
     }
 
     recover_rc4_cookie(&counts)
