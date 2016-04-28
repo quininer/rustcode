@@ -20,22 +20,18 @@ impl RC4 {
 
         RC4 { state: state, i: 0, j: 0 }
     }
+}
 
-    pub fn next(&mut self) -> u8 {
+impl Iterator for RC4 {
+    type Item = u8;
+    fn next(&mut self) -> Option<Self::Item> {
         self.i = self.i.wrapping_add(1);
         self.j = self.j.wrapping_add(self.state[self.i as usize]);
         self.state.swap(self.i as usize, self.j as usize);
 
         let i = self.state[self.i as usize]
             .wrapping_add(self.state[self.j as usize]);
-        self.state[i as usize]
-    }
-}
-
-impl Iterator for RC4 {
-    type Item = u8;
-    fn next(&mut self) -> Option<Self::Item> {
-        Some(RC4::next(self))
+        Some(self.state[i as usize])
     }
 }
 

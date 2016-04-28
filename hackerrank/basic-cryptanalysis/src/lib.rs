@@ -90,8 +90,7 @@ fn test() {
             d.iter()
                 .map(|s| s.chars().collect())
                 .collect()
-        ).iter())
-        {
+        ).iter()) {
             let mut impossible_tablet = impossible.entry(ww)
                 .or_insert(HashSet::new());
             for c in alphabet.difference(zz) {
