@@ -1,4 +1,7 @@
-use std::os::raw::c_char;
+#![no_std]
+
+#[allow(non_camel_case_types)]
+type c_char = i8;
 
 extern {
     fn printk(data: *const c_char);
