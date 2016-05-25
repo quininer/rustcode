@@ -1,0 +1,15 @@
+[package]
+name = "ldhook"
+version = "0.1.0"
+authors = ["quininer kel <quininer@live.com>"]
+
+[lib]
+crate-type = ["dylib"]
+
+[[bin]]
+name = "test"
+path = "src/test.rs"
+
+[dependencies]
+libloading = "0.2"
+libc = "0.2"
