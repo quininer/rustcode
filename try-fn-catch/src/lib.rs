@@ -1,8 +1,9 @@
-#![feature(question_mark)]
-
 macro_rules! try {
-    ( $exec:expr ) => {
+    ( move : $exec:expr ) => {
         (move || Ok($exec))()
+    };
+    ( $exec:expr ) => {
+        (|| Ok($exec))()
     }
 }
 
