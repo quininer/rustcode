@@ -10,9 +10,10 @@ use walkdir::WalkDir;
 fn start(dir: &str) -> io::Result<()> {
     for entry in WalkDir::new(dir)
         .into_iter()
-        .filter_map(|e| e.ok())
-        .filter(|e| e.path().join("Cargo.toml").is_file())
+        .filter_map(Result::ok)
+        .filter(|e| e.path().join("Cargo.lock").is_file())
     {
+        println!("clean: {}", entry.path().to_string_lossy());
         Command::new("cargo")
             .current_dir(entry.path())
             .arg("clean")
