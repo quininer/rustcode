@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["quininer kel <quininer@live.com>"]
 
 [dependencies]
-walkdir = "1.0"
+walkdir = "2.0"

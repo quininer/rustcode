@@ -1,0 +1,9 @@
+[package]
+name = "src2txt"
+version = "0.1.0"
+authors = ["quininer <quininer@live.com>"]
+
+[dependencies]
+zip = "0.3"
+humanesort = "0.1.0-alpha"
+encoding_rs = "0.7"
