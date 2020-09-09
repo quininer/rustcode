@@ -1,16 +1,32 @@
-macro_rules! try {
-    ( move : $exec:expr ) => {
-        (move || Ok($exec))()
-    };
-    ( $exec:expr ) => {
-        (|| Ok($exec))()
-    }
+macro_rules! try_ {
+    ( ref $( $token:tt )* ) => {{
+        let b = || {
+            $( $token )*
+        };
+        b()
+    }};
+    ( $( $token:tt )* ) => {{
+        let b = move || {
+            $( $token )*
+        };
+        b()
+    }};
 }
 
 #[test]
 fn test() {
-    match try!{ Err(())? } {
+    fn foo() -> std::io::Result<()> {
+        Ok(())
+    }
+
+    match try_!{ Err(())? } {
         Ok(()) => panic!(),
         Err(()) => ()
     }
+    
+    let ret = try_!{
+        let a = foo()?;
+        Ok(a) as std::io::Result<()>
+    };
+    ret.unwrap();
 }
